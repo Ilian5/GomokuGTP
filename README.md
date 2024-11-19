@@ -1,7 +1,7 @@
 # GomokuGTP
 Projet de Qualité Dev qui consiste à coder le Jeu Gomoku + Créer un modèle qui peut jouer tout seul
 
-Collaborateurs :
+## Collaborateurs :
 
 - PIERRE Ychnightder
 - ABOUELKHEIR Emad
