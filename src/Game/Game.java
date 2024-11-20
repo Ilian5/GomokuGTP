@@ -48,13 +48,15 @@ public class Game {
             commande = commande.toUpperCase();
             char color = commande.split(" ")[1].charAt(0);
             String mouvement = commande.split(" ")[2];
-            if(color == 'B' || color == 'W') {
-                if(mouvement.charAt(0) - 'A' <= taille - 1 && mouvement.charAt(1) <= taille - 1) {
-
-                } else
-                    System.out.println("Mouvement incorrect, Mouvement disponible compris entre A0 et " + ((char) ('A' + taille - 1)) + (taille - 1));
-            } else
+            if(!(color == 'B' || color == 'W')) {
                 System.out.println("Couleur incorrect, couleur possible : B (Black) | W (White)");
+                return;
+            }
+            if(!(mouvement.charAt(0) - 'A' <= (taille - 1) && Integer.parseInt(mouvement.substring(1)) <= taille - 1)) {
+                System.out.println("Mouvement incorrect, Mouvement disponible compris entre A0 et " + ((char) ('A' + taille - 1)) + (taille - 1));
+                return;
+            }
+            board.addBoule(new Boule(new Coordonnees((int) mouvement.charAt(0) - 'A', Integer.parseInt(mouvement.substring(1))), (color == 'B' ? Color.Black : Color.White)));
         } else {
             System.out.println("Commande incorrecte, veuillez entrer une couleur et un mouvement !");
         }

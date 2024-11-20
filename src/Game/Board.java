@@ -31,7 +31,7 @@ public class Board {
     }
 
     public String toString() {
-        StringBuilder s = new StringBuilder("   ");
+        StringBuilder s = new StringBuilder("  ");
         reloadBoule();
         for(int i = 0; i < taille; i++) {
             s.append(i < 10 ? " " : "").append(i).append(" ");
