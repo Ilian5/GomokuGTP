@@ -56,10 +56,27 @@ public class Game {
                 System.out.println("Mouvement incorrect, Mouvement disponible compris entre A0 et " + ((char) ('A' + taille - 1)) + (taille - 1));
                 return;
             }
+            if(!mouvementPossible(mouvement)) {
+                System.out.println("Mouvement impossible, une boule est déjà à ces coordonnées !");
+                return;
+            }
+
             board.addBoule(new Boule(new Coordonnees((int) mouvement.charAt(0) - 'A', Integer.parseInt(mouvement.substring(1))), (color == 'B' ? Color.Black : Color.White)));
         } else {
             System.out.println("Commande incorrecte, veuillez entrer une couleur et un mouvement !");
         }
+    }
+
+    private boolean mouvementPossible(String mouvement) {
+        int mouvementLettre = mouvement.charAt(0) - 'A';
+        int mouvementChiffre = Integer.parseInt(mouvement.substring(1));
+        boolean mouvementPossible = true;
+        for(Boule b : board.getBoule()) {
+            if(b.getCoordonnees().getX() == mouvementLettre && b.getCoordonnees().getY() == mouvementChiffre) {
+                mouvementPossible = false;
+            }
+        }
+        return mouvementPossible;
     }
 
     private boolean checkPartieFinie() { //vérifie que la partie est fini

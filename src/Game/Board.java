@@ -1,5 +1,6 @@
 package Game;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Board {
@@ -15,6 +16,9 @@ public class Board {
         initialiseGrille();
     }
 
+    public ArrayList<Boule> getBoule() {
+        return boule;
+    }
 
     public void initialiseGrille() {
         for (int i = 0; i < taille; i++) {
