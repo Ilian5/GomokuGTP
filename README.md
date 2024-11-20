@@ -18,7 +18,7 @@ Le modèle est conçu pour simuler un adversaire jouant selon des stratégies fi
 ## 📜 Instructions pour exécuter le projet
 1. Clonez ce dépôt sur votre machine locale :
    ```bash
-   git clone <URL_DU_REPO>
+   git clone (https://github.com/Ilian5/GomokuGTP.git)
 
 ## 👥 Participants
 - [DESBOIS Ilian](https://github.com/Ilian5)
