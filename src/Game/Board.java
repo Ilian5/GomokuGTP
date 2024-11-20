@@ -20,17 +20,21 @@ public class Board {
         return boule;
     }
 
+    public void reloadBoule() {
+        for(Boule b : boule) {
+            grille[b.getCoordonnees().getX()][b.getCoordonnees().getY()] = b.getColor().getColorChar();
+        }
+    }
+
+    public void addBoule(Boule b) {
+        boule.add(b);
+    }
+
     public void initialiseGrille() {
         for (int i = 0; i < taille; i++) {
             for (int j = 0; j < taille; j++) {
                 grille[i][j] = '.';
             }
-        }
-    }
-
-    public void reloadBoule() {
-        for(Boule b : boule) {
-            grille[b.getCoordonnees().getX()][b.getCoordonnees().getY()] = b.getColor().getColorChar();
         }
     }
 
@@ -53,8 +57,5 @@ public class Board {
         return s.toString();
     }
 
-    public void addBoule(Boule b) {
-        boule.add(b);
-    }
 
 }
