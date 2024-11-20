@@ -39,8 +39,24 @@ public class Game {
         } else if(commande.startsWith("showboard")) {
             System.out.println(board.toString());
         } else if(commande.startsWith("play")) {
-            String color = commande.split(" ")[1];
-            System.out.println(color);
+            playTour(commande);
+        }
+    }
+
+    private void playTour(String commande) {
+        if(commande.split(" ").length == 3) {
+            commande = commande.toUpperCase();
+            char color = commande.split(" ")[1].charAt(0);
+            String mouvement = commande.split(" ")[2];
+            if(color == 'B' || color == 'W') {
+                if(mouvement.charAt(0) - 'A' <= taille - 1 && mouvement.charAt(1) <= taille - 1) {
+
+                } else
+                    System.out.println("Mouvement incorrect, Mouvement disponible compris entre A0 et " + ((char) ('A' + taille - 1)) + (taille - 1));
+            } else
+                System.out.println("Couleur incorrect, couleur possible : B (Black) | W (White)");
+        } else {
+            System.out.println("Commande incorrecte, veuillez entrer une couleur et un mouvement !");
         }
     }
 
