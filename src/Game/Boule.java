@@ -18,8 +18,4 @@ public class Boule {
     public Coordonnees getCoordonnees() {
         return coordonnees;
     }
-
-    public void setCoordonnees(Coordonnees coordonnees) {
-        this.coordonnees = coordonnees;
-    }
 }
