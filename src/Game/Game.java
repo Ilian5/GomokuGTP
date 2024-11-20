@@ -17,4 +17,16 @@ public class Game {
         board.addBoule(new Boule(new Coordonnees(1,5), Color.Black));
         System.out.println(board.toString());
     }
+
+    public void jouePartie() { //Permet de jouer une partie
+        while (true) {
+            if(partieFini())
+                break;
+        }
+    }
+
+    private boolean partieFini() { //vérifie que la partie est fini
+        return false;
+    }
+
 }
