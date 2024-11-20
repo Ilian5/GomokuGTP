@@ -1,0 +1,23 @@
+package Game;
+
+public class Boule {
+    private Coordonnees coordonnees;
+    private Color color;
+
+    public Boule(Coordonnees coordonnees, Color color) {
+        this.coordonnees = coordonnees;
+        this.color = color;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public Coordonnees getCoordonnees() {
+        return coordonnees;
+    }
+
+    public void setCoordonnees(Coordonnees coordonnees) {
+        this.coordonnees = coordonnees;
+    }
+}
