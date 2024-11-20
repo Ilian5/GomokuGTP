@@ -39,7 +39,8 @@ public class Board {
         s.append("\n");
 
         for (int i = 0; i < taille; i++) {
-            s.append(i < 10 ? " " : "").append(i).append(" ");
+            char letter = (char) ('A' + i);
+            s.append(letter).append(" ");
             for (int j = 0; j < taille; j++) {
                 s.append(" ").append(grille[i][j]).append(" ");
             }

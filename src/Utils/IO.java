@@ -18,6 +18,9 @@ public class IO {
         listeCommande = new ArrayList<>();
         listeCommande.add("quit");
         listeCommande.add("boardsize");
+        listeCommande.add("clearboard");
+        listeCommande.add("showboard");
+        listeCommande.add("play");
     }
 
     public String getCommande() {

@@ -22,7 +22,6 @@ public class Game {
 
     public void jouePartie() { //Permet de jouer une partie
         while (true) {
-            System.out.println(board.toString());
             executeCommande(io.getCommande());
             if(checkPartieFinie())
                 break;
@@ -35,6 +34,13 @@ public class Game {
         } else if(commande.startsWith("boardsize")) {
             taille = Integer.parseInt(commande.split(" ")[1]);
             board = new Board(taille);
+        } else if(commande.startsWith("clearboard")) {
+            board = new Board(taille);
+        } else if(commande.startsWith("showboard")) {
+            System.out.println(board.toString());
+        } else if(commande.startsWith("play")) {
+            String color = commande.split(" ")[1];
+            System.out.println(color);
         }
     }
 
