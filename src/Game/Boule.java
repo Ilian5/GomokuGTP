@@ -1,5 +1,7 @@
 package Game;
 
+import Utils.Color;
+
 public class Boule {
     private Coordonnees coordonnees;
     private Color color;
