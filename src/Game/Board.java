@@ -57,5 +57,7 @@ public class Board {
         return s.toString();
     }
 
-
+    public char[][] getGrille() {
+        return grille;
+    }
 }

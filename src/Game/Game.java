@@ -53,7 +53,7 @@ public class Game {
                 return;
             }
             if(!(mouvement.charAt(0) - 'A' <= (taille - 1) && Integer.parseInt(mouvement.substring(1)) <= taille - 1)) {
-                System.out.println("Mouvement incorrect, Mouvement disponible compris entre A0 et " + ((char) ('A' + taille - 1)) + (taille - 1));
+                System.out.println("Mouvement incorrect, Mouvement disponible compris entre A0 et " + ((char) ('A' + taille - 1)) + (taille - 1) + "\n" + getMouvementDisponible());
                 return;
             }
             if(!mouvementPossible(mouvement)) {
@@ -81,6 +81,21 @@ public class Game {
 
     private boolean checkPartieFinie() { //vérifie que la partie est fini
         return partieFinie;
+    }
+
+    private String getMouvementDisponible() {
+        StringBuilder s = new StringBuilder("[\n");
+        for(int i = 0; i < taille; ++i){
+            for(int j = 0; j < taille; ++j) {
+                if(board.getGrille()[i][j] == '.') {
+                    s.append((char) ('A' + i)).append(j).append((j == taille - 1 ? "" : ","));
+                }
+            }
+            s.append("\n");
+        }
+        s.append("]\n");
+        s.append(board.toString());
+        return s.toString();
     }
 
 }
