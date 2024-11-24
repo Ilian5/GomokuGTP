@@ -28,25 +28,66 @@ public class Game {
     }
 
     public void jouePartie() { //Permet de jouer une partie
-        while (true) {
+        do {
             executeCommande(io.getCommande());
-            if(checkPartieFinie())
+        } while (!checkPartieFinie());
+    }
+
+    private void executeCommande(String commande) {
+        String[] parts = commande.split(" ", 2);
+        String action = parts[0];
+        String argument = parts.length > 1 ? parts[1] : null;
+
+        switch (action) {
+            case "quit":
+                gameFinished = true;
+                break;
+            case "boardsize":
+                commandBoardSize(argument);
+                break;
+            case "clearboard":
+                board = new Board(taille);
+                break;
+            case "showboard":
+                System.out.println(board);
+                break;
+            case "play":
+                if (argument != null) {
+                    gameStarted = true;
+                    playTour(commande);
+                } else {
+                    System.out.println("Erreur : Argument manquant pour la commande 'play'.");
+                }
+                break;
+            case "partiestop":
+                if (gameStarted) {
+                    gameStarted = false;
+                    System.out.println("Partie arrêtée.");
+                } else {
+                    System.out.println("Erreur : Aucune partie en cours à arrêter.");
+                }
+                break;
+            default:
+                System.out.println("Commande inconnue : " + action);
                 break;
         }
     }
 
-    private void executeCommande(String commande) {
-        if(commande.startsWith("quit")) {
-            partieFinie = true;
-        } else if(commande.startsWith("boardsize")) {
-            taille = Integer.parseInt(commande.split(" ")[1]);
+    private void commandBoardSize(String argument) {
+        if (gameStarted) {
+            System.out.println("Une partie est déjà en cours ! Veuillez la terminer ou y mettre fin (partiestop) !");
+            return;
+        }
+        if (argument == null) {
+            System.out.println("Erreur : Aucun argument fourni pour la taille.");
+            return;
+        }
+        try {
+            taille = Integer.parseInt(argument);
             board = new Board(taille);
-        } else if(commande.startsWith("clearboard")) {
-            board = new Board(taille);
-        } else if(commande.startsWith("showboard")) {
-            System.out.println(board.toString());
-        } else if(commande.startsWith("play")) {
-            playTour(commande);
+            gameStarted = true;
+        } catch (NumberFormatException e) {
+            System.out.println("Erreur : Taille invalide. Veuillez entrer un entier.");
         }
     }
 

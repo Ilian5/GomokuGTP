@@ -5,9 +5,9 @@ import java.util.ArrayList;
 
 public class Board {
 
-    private ArrayList<Boule> boule;
-    private char[][] grille;
-    private int taille;
+    private final ArrayList<Boule> boule;
+    private final char[][] grille;
+    private final int taille;
 
     public Board(int taille) {
         boule = new ArrayList<Boule>();
