@@ -10,6 +10,9 @@ public class Game {
     private IO io;
     private boolean partieFinie = false;
 
+    public int getTaille() {
+        return taille;
+    }
     public Game(int taille) {
         this.taille = taille;
         this.board = new Board(taille);
@@ -26,6 +29,9 @@ public class Game {
             if(checkPartieFinie())
                 break;
         }
+    }
+    public void testExecuteCommande(String commande) {
+        executeCommande(commande);
     }
 
     private void executeCommande(String commande) {
@@ -83,6 +89,10 @@ public class Game {
         return partieFinie;
     }
 
+    public boolean testcheckPartieFinie() {
+        return partieFinie;
+    }
+
     private String getMouvementDisponible() {
         StringBuilder s = new StringBuilder("[\n");
         for(int i = 0; i < taille; ++i){
@@ -98,4 +108,7 @@ public class Game {
         return s.toString();
     }
 
+    public Board getBoard() {
+        return board;
+    }
 }
