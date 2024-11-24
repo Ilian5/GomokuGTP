@@ -2,47 +2,51 @@ package Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
-public class IO {
+public class IO {//IO pour Input/Output
 
     private Scanner scanner;
-    private ArrayList<String> listeCommande;
+    private static final List<String> LISTE_COMMANDE = List.of(
+            "quit",
+            "boardsize",
+            "clearboard",
+            "showboard",
+            "play",
+            "partiestop"
+    );
 
     public IO() {
         scanner = new Scanner(System.in);
-        initialiseCommande();
     }
 
-    public void initialiseCommande() {
-        listeCommande = new ArrayList<>();
-        listeCommande.add("quit");
-        listeCommande.add("boardsize");
-        listeCommande.add("clearboard");
-        listeCommande.add("showboard");
-        listeCommande.add("play");
+    public List<String> getListeCommande() {
+        return LISTE_COMMANDE;
     }
 
     public String getCommande() {
         System.out.println("Veuillez saisir le commande : ");
-        String command = " ";
-        Boolean commandeAvailable = false;
-        while(true) {
-            command = scanner.nextLine();
-            for (String s : listeCommande) {
-                if(command.startsWith(s))
-                    commandeAvailable = true;
+        while (true) {
+            String command = scanner.nextLine();
+            boolean commandeAvailable = getListeCommande().stream().anyMatch(command::startsWith);
+
+            if (commandeAvailable) {
+                return command;
             }
-            if(commandeAvailable == true)
-                break;
-            System.out.print("Veuillez saisir une commande existante : \n(Commande existante : ");
-            for(String s : listeCommande) {
-                System.out.print(s + ", ");
-            }
-            System.out.println(")");
+            System.out.print("Commande invalide. Veuillez réessayer.\n(Commandes existantes : ");
+            System.out.println(String.join(", ", getListeCommande()) + ")");
         }
-        return command;
     }
 
+    public int getTailleDebutGame() {
+        System.out.println("Veuillez entrer une taille de tableau :");
+        while (!scanner.hasNextInt()) {
+            System.out.println("Entrée invalide. Veuillez entrer uniquement un nombre :");
+            scanner.next();
+        }
+        return scanner.nextInt();
+
+    }
 
 }
