@@ -1,48 +1,69 @@
 package Utils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
+/**
+ * La classe {@code IO} gère les entrées et sorties de commandes de l'utilisateur dans la console.
+ * Elle permet d'afficher des messages et de récupérer des commandes saisies par l'utilisateur,
+ * tout en vérifiant leur validité à partir d'une liste prédéfinie de commandes valides.
+ */
 public class IO {
 
-    private Scanner scanner;
-    private ArrayList<String> listeCommande;
+    private final Scanner scanner;
 
+    /**
+     * Liste statique des commandes valides que l'utilisateur peut saisir.
+     */
+    private static final List<String> LISTE_COMMANDE = List.of(
+            "quit",
+            "boardsize",
+            "clearboard",
+            "showboard",
+            "play",
+            "partiestop"
+    );
+
+    /**
+     * Constructeur de la classe {@code IO}.
+     * Initialise le scanner pour lire les entrées de l'utilisateur.
+     */
     public IO() {
         scanner = new Scanner(System.in);
-        initialiseCommande();
     }
 
-    public void initialiseCommande() {
-        listeCommande = new ArrayList<>();
-        listeCommande.add("quit");
-        listeCommande.add("boardsize");
-        listeCommande.add("clearboard");
-        listeCommande.add("showboard");
-        listeCommande.add("play");
+    /**
+     * Retourne la liste des commandes valides.
+     *
+     * @return La liste des commandes valides.
+     */
+    public List<String> getListeCommande() {
+        return LISTE_COMMANDE;
     }
 
+    /**
+     * Demande à l'utilisateur de saisir une commande et vérifie si la commande est valide.
+     * Si la commande est invalide, l'utilisateur est invité à réessayer.
+     * La commande doit commencer par l'une des commandes valides de {@code LISTE_COMMANDE}.
+     *
+     * @return La commande saisie et validée par l'utilisateur.
+     */
     public String getCommande() {
-        System.out.println("Veuillez saisir le commande : ");
-        String command = " ";
-        Boolean commandeAvailable = false;
-        while(true) {
-            command = scanner.nextLine();
-            for (String s : listeCommande) {
-                if(command.startsWith(s))
-                    commandeAvailable = true;
+        System.out.println("Veuillez saisir une commande :");
+
+        while (true) {
+            String command = scanner.nextLine().trim();
+
+            // Vérifie si la commande saisie commence par l'une des commandes valides
+            boolean commandeAvailable = getListeCommande().stream()
+                    .anyMatch(command::startsWith);
+
+            if (commandeAvailable) {
+                return command;
             }
-            if(commandeAvailable == true)
-                break;
-            System.out.print("Veuillez saisir une commande existante : \n(Commande existante : ");
-            for(String s : listeCommande) {
-                System.out.print(s + ", ");
-            }
-            System.out.println(")");
+
+            System.out.print("Commande invalide. Veuillez réessayer.\n(Commandes existantes : ");
+            System.out.println(String.join(", ", getListeCommande()) + ")");
         }
-        return command;
     }
-
-
 }
