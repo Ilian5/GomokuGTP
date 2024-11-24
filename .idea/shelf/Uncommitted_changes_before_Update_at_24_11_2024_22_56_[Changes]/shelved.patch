@@ -1,0 +1,209 @@
+Index: src/Game/Game.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package Game;\r\n\r\nimport Utils.Color;\r\nimport Utils.IO;\r\n\r\npublic class Game {\r\n\r\n    private int taille;\r\n    private Board board;\r\n    private IO io;\r\n    private boolean partieFinie = false;\r\n\r\n    public Game(int taille) {\r\n        this.taille = taille;\r\n        this.board = new Board(taille);\r\n        this.io = new IO();\r\n    }\r\n\r\n    public void startSession() {\r\n        jouePartie();\r\n    }\r\n\r\n    public void jouePartie() { //Permet de jouer une partie\r\n        while (true) {\r\n            executeCommande(io.getCommande());\r\n            if(checkPartieFinie())\r\n                break;\r\n        }\r\n    }\r\n\r\n    private void executeCommande(String commande) {\r\n        if(commande.startsWith(\"quit\")) {\r\n            partieFinie = true;\r\n        } else if(commande.startsWith(\"boardsize\")) {\r\n            taille = Integer.parseInt(commande.split(\" \")[1]);\r\n            board = new Board(taille);\r\n        } else if(commande.startsWith(\"clearboard\")) {\r\n            board = new Board(taille);\r\n        } else if(commande.startsWith(\"showboard\")) {\r\n            System.out.println(board.toString());\r\n        } else if(commande.startsWith(\"play\")) {\r\n            playTour(commande);\r\n        }\r\n    }\r\n\r\n    private void playTour(String commande) {\r\n        if(commande.split(\" \").length == 3) {\r\n            commande = commande.toUpperCase();\r\n            char color = commande.split(\" \")[1].charAt(0);\r\n            String mouvement = commande.split(\" \")[2];\r\n            if(!(color == 'B' || color == 'W')) {\r\n                System.out.println(\"Couleur incorrect, couleur possible : B (Black) | W (White)\");\r\n                return;\r\n            }\r\n            if(!(mouvement.charAt(0) - 'A' <= (taille - 1) && Integer.parseInt(mouvement.substring(1)) <= taille - 1)) {\r\n                System.out.println(\"Mouvement incorrect, Mouvement disponible compris entre A0 et \" + ((char) ('A' + taille - 1)) + (taille - 1) + \"\\n\" + getMouvementDisponible());\r\n                return;\r\n            }\r\n            if(!mouvementPossible(mouvement)) {\r\n                System.out.println(\"Mouvement impossible, une boule est déjà à ces coordonnées !\");\r\n                return;\r\n            }\r\n\r\n            board.addBoule(new Boule(new Coordonnees((int) mouvement.charAt(0) - 'A', Integer.parseInt(mouvement.substring(1))), (color == 'B' ? Color.Black : Color.White)));\r\n        } else {\r\n            System.out.println(\"Commande incorrecte, veuillez entrer une couleur et un mouvement !\");\r\n        }\r\n    }\r\n\r\n    private boolean mouvementPossible(String mouvement) {\r\n        int mouvementLettre = mouvement.charAt(0) - 'A';\r\n        int mouvementChiffre = Integer.parseInt(mouvement.substring(1));\r\n        boolean mouvementPossible = true;\r\n        for(Boule b : board.getBoule()) {\r\n            if(b.getCoordonnees().getX() == mouvementLettre && b.getCoordonnees().getY() == mouvementChiffre) {\r\n                mouvementPossible = false;\r\n            }\r\n        }\r\n        return mouvementPossible;\r\n    }\r\n\r\n    private boolean checkPartieFinie() { //vérifie que la partie est fini\r\n        return partieFinie;\r\n    }\r\n\r\n    private String getMouvementDisponible() {\r\n        StringBuilder s = new StringBuilder(\"[\\n\");\r\n        for(int i = 0; i < taille; ++i){\r\n            for(int j = 0; j < taille; ++j) {\r\n                if(board.getGrille()[i][j] == '.') {\r\n                    s.append((char) ('A' + i)).append(j).append((j == taille - 1 ? \"\" : \",\"));\r\n                }\r\n            }\r\n            s.append(\"\\n\");\r\n        }\r\n        s.append(\"]\\n\");\r\n        s.append(board.toString());\r\n        return s.toString();\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Game/Game.java b/src/Game/Game.java
+--- a/src/Game/Game.java	(revision 1e1aa2e0ab0bf9f5169a18c38ed4a768b7f2f4b0)
++++ b/src/Game/Game.java	(date 1732484132802)
+@@ -10,6 +10,9 @@
+     private IO io;
+     private boolean partieFinie = false;
+ 
++    public int getTaille() {
++        return taille;
++    }
+     public Game(int taille) {
+         this.taille = taille;
+         this.board = new Board(taille);
+@@ -27,6 +30,9 @@
+                 break;
+         }
+     }
++    public void testExecuteCommande(String commande) {
++        executeCommande(commande);
++    }
+ 
+     private void executeCommande(String commande) {
+         if(commande.startsWith("quit")) {
+@@ -83,6 +89,10 @@
+         return partieFinie;
+     }
+ 
++    public boolean testcheckPartieFinie() {
++        return partieFinie;
++    }
++
+     private String getMouvementDisponible() {
+         StringBuilder s = new StringBuilder("[\n");
+         for(int i = 0; i < taille; ++i){
+@@ -98,4 +108,7 @@
+         return s.toString();
+     }
+ 
++    public Board getBoard() {
++        return board;
++    }
+ }
+Index: src/Utils/Color.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package Utils;\r\n\r\npublic enum Color {\r\n\r\n    Black('B'),\r\n    White('W');\r\n\r\n    private char color;\r\n\r\n    Color(char color) {\r\n        this.color = color;\r\n    }\r\n\r\n    public char getColorChar() {\r\n        return color;\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Utils/Color.java b/src/Utils/Color.java
+--- a/src/Utils/Color.java	(revision 1e1aa2e0ab0bf9f5169a18c38ed4a768b7f2f4b0)
++++ b/src/Utils/Color.java	(date 1732485350406)
+@@ -1,12 +1,10 @@
+ package Utils;
+-
+ public enum Color {
+ 
+     Black('B'),
+     White('W');
+ 
+     private char color;
+-
+     Color(char color) {
+         this.color = color;
+     }
+Index: src/Utils/IO.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package Utils;\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.HashMap;\r\nimport java.util.Scanner;\r\n\r\npublic class IO {\r\n\r\n    private Scanner scanner;\r\n    private ArrayList<String> listeCommande;\r\n\r\n    public IO() {\r\n        scanner = new Scanner(System.in);\r\n        initialiseCommande();\r\n    }\r\n\r\n    public void initialiseCommande() {\r\n        listeCommande = new ArrayList<>();\r\n        listeCommande.add(\"quit\");\r\n        listeCommande.add(\"boardsize\");\r\n        listeCommande.add(\"clearboard\");\r\n        listeCommande.add(\"showboard\");\r\n        listeCommande.add(\"play\");\r\n    }\r\n\r\n    public String getCommande() {\r\n        System.out.println(\"Veuillez saisir le commande : \");\r\n        String command = \" \";\r\n        Boolean commandeAvailable = false;\r\n        while(true) {\r\n            command = scanner.nextLine();\r\n            for (String s : listeCommande) {\r\n                if(command.startsWith(s))\r\n                    commandeAvailable = true;\r\n            }\r\n            if(commandeAvailable == true)\r\n                break;\r\n            System.out.print(\"Veuillez saisir une commande existante : \\n(Commande existante : \");\r\n            for(String s : listeCommande) {\r\n                System.out.print(s + \", \");\r\n            }\r\n            System.out.println(\")\");\r\n        }\r\n        return command;\r\n    }\r\n\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Utils/IO.java b/src/Utils/IO.java
+--- a/src/Utils/IO.java	(revision 1e1aa2e0ab0bf9f5169a18c38ed4a768b7f2f4b0)
++++ b/src/Utils/IO.java	(date 1732479429361)
+@@ -43,6 +43,4 @@
+         }
+         return command;
+     }
+-
+-
+ }
+Index: src/GTPCommandsTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/GTPCommandsTest.java b/src/GTPCommandsTest.java
+new file mode 100644
+--- /dev/null	(date 1732484950369)
++++ b/src/GTPCommandsTest.java	(date 1732484950369)
+@@ -0,0 +1,109 @@
++import Utils.Color;
++import Utils.IO;
++import java.io.*;
++import Game.Game;
++import org.junit.Test;
++
++import static org.junit.jupiter.api.Assertions.*;
++
++public class GTPCommandsTest {
++    private final int TAILLE_GOMOKU_MAX = 19;
++    private final int TAILLE_GOMOKU_MIN = 5;
++
++    private Game gameTest = new Game (7);
++    @Test
++    public void testBoardSize() {
++        gameTest.testExecuteCommande("boardsize 5");
++        assertEquals(TAILLE_GOMOKU_MIN, gameTest.getTaille(), "La taille devrait être 5.");
++    }
++    @Test public void testBoardSizePetite(){
++        assertThrows(NumberFormatException.class, () ->{
++            gameTest.testExecuteCommande("boardsize 1");
++        },"La taille du plateau est trop petit 1 la taille doit etre superieur = a 5");
++    }
++
++    @Test public void testBoardSizeGrand(){
++        assertThrows(NumberFormatException.class, () ->{
++            gameTest.testExecuteCommande("boardsize 25");
++        },"La taille du plateau est trop grand 25 la taille doit etre inferieur = a 19");
++    }
++
++    @Test
++    public void testTailleInvalide() {
++        assertThrows(NumberFormatException.class, () ->{
++            gameTest.testExecuteCommande("boardsize d");
++        },"taille de plateau invalide.");
++    }
++
++    @Test
++    public void testPlay(){
++        gameTest.testExecuteCommande("play black D5");
++        String plateau = "   0  1  2  3  4  5  6 \n" +
++                "A  .  .  .  .  .  .  . \n" +
++                "B  .  .  .  .  .  .  . \n" +
++                "C  .  .  .  .  .  .  . \n" +
++                "D  .  .  .  .  .  B  . \n" +
++                "E  .  .  .  .  .  .  . \n" +
++                "F  .  .  .  .  .  .  . \n" +
++                "G  .  .  .  .  .  .  .";
++
++       assertEquals(plateau, gameTest.getBoard());
++    }
++
++    @Test
++   public void testInvalideFormatPlayCommand() {
++        assertThrows(IllegalArgumentException.class, () -> {
++            gameTest.testExecuteCommande("play D5");
++        }, "Une IllegalArgumentException devrait être levée pour une commande mal ecrite (color).");
++    }
++    @Test
++    public void testInvalidePlay() {
++        assertThrows(NumberFormatException.class, () -> {
++            gameTest.testExecuteCommande("play black Dd5");
++        }, "Une NumberFormatException devrait être levée play black Dd5 est invalide .");
++    }
++
++
++
++    @Test
++    public void testPlayMoveOccupe() {
++        Game gameTest = new Game(7);
++        gameTest.testExecuteCommande("play black D5");
++
++        assertThrows(IllegalArgumentException.class, () -> {
++            gameTest.testExecuteCommande("play white D5");
++        }, "La case D5 est déjà occupée et ne devrait pas permettre un second mouvement.");
++    }
++
++
++    @Test
++   public void testClearBoard() {
++        gameTest.testExecuteCommande("play black D5");
++        gameTest.testExecuteCommande("clearboard");
++       String f = "   0  1  2  3  4  5  6 \n" +
++               "A  .  .  .  .  .  .  . \n" +
++               "B  .  .  .  .  .  .  . \n" +
++               "C  .  .  .  .  .  .  . \n" +
++               "D  .  .  .  .  .  .  . \n" +
++               "E  .  .  .  .  .  .  . \n" +
++               "F  .  .  .  .  .  .  . \n" +
++               "G  .  .  .  .  .  .  . \n";
++
++       assertEquals(f, gameTest.getBoard());
++    }
++
++
++    @Test
++    public void testShowBoard() {
++        gameTest.testExecuteCommande("boardsize 5");
++        gameTest.testExecuteCommande("showboard");
++        assertNotNull(gameTest.getBoard().toString(), "Le plateau devrait être affiché.");
++    }
++
++    @Test
++    public void testQuitCommand() {
++        gameTest.testExecuteCommande("quit");
++        assertTrue(gameTest.testcheckPartieFinie(), "La commande 'quit' devrait terminer la partie.");
++    }
++
++}
+\ No newline at end of file
