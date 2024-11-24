@@ -24,7 +24,6 @@ public class Game {
      */
     public Game() {
         this.taille = TAILLE_DEFAULT;
-        this.board = new Board(taille);
         this.io = new IO();
         this.gameFinished = false;
         this.gameStarted = false;
@@ -35,6 +34,7 @@ public class Game {
      */
     public void startSession() {
         taille = io.getTailleDebutPartie();
+        this.board = new Board(taille);
         jouePartie();
     }
 
@@ -150,9 +150,17 @@ public class Game {
      * @return {@code true} si le mouvement est valide, {@code false} sinon.
      */
     private boolean isMouvementPossible(String mouvement) {
-        return mouvement.charAt(0) - 'A' <= (taille - 1) &&
-                Integer.parseInt(mouvement.substring(1)) <= taille - 1;
+        if (mouvement.isEmpty() || mouvement.charAt(0) < 'A' || mouvement.charAt(0) > 'A' + taille - 1) {
+            return false;
+        }
+        try {
+            int mouvementChiffre = Integer.parseInt(mouvement.substring(1));
+            return mouvementChiffre >= 0 && mouvementChiffre < taille;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
+
 
     /**
      * Vérifie si la position donnée par le mouvement est déjà occupée par une boule.
@@ -198,7 +206,6 @@ public class Game {
             s.append("\n");
         }
         s.append("]\n");
-        s.append(board.toString());
         return s.toString();
     }
 
