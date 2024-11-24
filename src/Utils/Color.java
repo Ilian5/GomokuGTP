@@ -16,6 +16,6 @@ public enum Color {
     }
 
     public char toChar() {
-        return color;
+        return color;a
     }
 }
