@@ -1,6 +1,5 @@
-import Utils.Color;
-import Utils.IO;
-import java.io.*;
+package test;
+
 import Game.Game;
 import org.junit.Test;
 
