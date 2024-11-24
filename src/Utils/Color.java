@@ -14,4 +14,8 @@ public enum Color {
     public char getColorChar() {
         return color;
     }
+
+    public char toChar() {
+        return color;
+    }
 }
