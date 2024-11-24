@@ -5,13 +5,15 @@ import Utils.IO;
 
 public class Game {
 
+    private static final int TAILLE_DEFAULT = 19;
+
     private int taille;
     private Board board;
     private IO io;
     private boolean partieFinie = false;
 
-    public Game(int taille) {
-        this.taille = taille;
+    public Game() {
+        this.taille = TAILLE_DEFAULT;
         this.board = new Board(taille);
         this.io = new IO();
     }
