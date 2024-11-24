@@ -5,20 +5,25 @@ import Utils.IO;
 
 public class Game {
 
-    private static final int TAILLE_DEFAULT = 19;
+    private static final int TAILLE_DEFAULT = 19; //Taille du plateau par défaut
+    private static final int NB_BOULLE_ALIGNE = 5; //Nombre de boulle à aligner pour gagner
 
-    private int taille;
     private Board board;
     private IO io;
-    private boolean partieFinie = false;
+    private int taille;
+    private boolean gameFinished;
+    private boolean gameStarted;
 
     public Game() {
         this.taille = TAILLE_DEFAULT;
         this.board = new Board(taille);
         this.io = new IO();
+        this.gameFinished = false;
+        this.gameStarted = false;
     }
 
     public void startSession() {
+        taille = io.getTailleDebutPartie();
         jouePartie();
     }
 

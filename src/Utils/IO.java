@@ -66,4 +66,20 @@ public class IO {
             System.out.println(String.join(", ", getListeCommande()) + ")");
         }
     }
+
+    /**
+     * Demande à l'utilisateur de saisir une taille de tableau (un entier) pour commencer la partie.
+     * Si l'utilisateur entre une valeur non numérique, la méthode affiche un message d'erreur
+     * et lui demande de saisir un nombre valide.
+     *
+     * @return La taille du tableau saisie par l'utilisateur. Cette valeur est un entier.
+     */
+    public int getTailleDebutPartie() {
+        System.out.println("Veuillez entrer une taille de tableau :");
+        while (!scanner.hasNextInt()) {
+            System.out.println("Entrée invalide. Veuillez entrer uniquement un nombre :");
+            scanner.next();
+        }
+        return scanner.nextInt();
+    }
 }
