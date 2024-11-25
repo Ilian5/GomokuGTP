@@ -12,6 +12,10 @@ public class Game {
     private static final int TAILLE_DEFAULT = 19; //Taille du plateau par défaut
     private static final int NB_BOULE_ALIGNE = 5; //Nombre de boules à aligner pour gagner
 
+    public Board getBoard() {
+        return board;
+    }
+
     private Board board;
     private final IO io;
     private int taille;
@@ -51,7 +55,7 @@ public class Game {
      * Exécute la commande entrée par l'utilisateur en fonction de l'action spécifiée.
      * @param commande La commande entrée par l'utilisateur.
      */
-    private void executeCommande(String commande) {
+    protected void executeCommande(String commande) {
         String[] parts = commande.split(" ", 2);
         String action = parts[0];
         String argument = parts.length > 1 ? parts[1] : null;
@@ -94,7 +98,8 @@ public class Game {
      * Définit la taille du plateau de jeu si aucune partie n'a commencé.
      * @param argument Taille du plateau sous forme de chaîne de caractères.
      */
-    private void commandBoardSize(String argument) {
+    private void commandBoardSize(String argument) throws NumberFormatException {
+
         if (gameStarted) {
             System.out.println("Une partie est déjà en cours ! Veuillez la terminer ou y mettre fin (partiestop) !");
             return;
@@ -105,10 +110,11 @@ public class Game {
         }
         try {
             taille = Integer.parseInt(argument);
+            assert  taille <= TAILLE_DEFAULT && taille >= NB_BOULE_ALIGNE;
             board = new Board(taille);
             gameStarted = true;
         } catch (NumberFormatException e) {
-            System.out.println("Erreur : Taille invalide. Veuillez entrer un entier.");
+            throw new NumberFormatException("Erreur : " + argument + " pour la taille.Veuillez entrer un entier.");
         }
     }
 
@@ -116,13 +122,13 @@ public class Game {
      * Joue un tour de jeu en vérifiant la validité du mouvement avant de l'appliquer.
      * @param commande La commande contenant la couleur et la position du mouvement.
      */
-    private void playTour(String commande) {
-        String[] parts = commande.toUpperCase().split(" ");
+    private void playTour(String commande) throws IllegalArgumentException {
+        try {
+            String[] parts = commande.toUpperCase().split(" ");
         if(parts.length != 3) {
             System.out.println("Commande incorrecte, veuillez entrer une couleur et un mouvement !");
             return;
         }
-
         char color = parts[1].charAt(0);
         String mouvement = parts[2];
 
@@ -142,6 +148,10 @@ public class Game {
         Coordonnees coord = new Coordonnees((int) mouvement.charAt(0) - 'A', Integer.parseInt(mouvement.substring(1)));
         Color bouleColor = (color == 'B' ? Color.Black : Color.White);
         board.addBoule(new Boule(coord, bouleColor));
+        }
+        catch(IllegalArgumentException e) {
+            throw  new IllegalArgumentException("Commande inexistant : " + commande);
+        }
     }
 
     /**
@@ -187,7 +197,7 @@ public class Game {
      * Vérifie si la partie est terminée.
      * @return {@code true} si la partie est terminée, {@code false} sinon.
      */
-    private boolean checkPartieFinie() { //vérifie que la partie est fini
+    protected boolean checkPartieFinie() { //vérifie que la partie est fini
         return gameFinished;
     }
 
@@ -207,6 +217,11 @@ public class Game {
         }
         s.append("]\n");
         return s.toString();
+    }
+
+
+    protected int getTaille() {
+        return taille;
     }
 
 }
