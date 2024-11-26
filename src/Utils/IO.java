@@ -48,23 +48,18 @@ public class IO {
      *
      * @return La commande saisie et validée par l'utilisateur.
      */
-    public String getCommande() {
+    public String getCommande() throws IllegalArgumentException {
         System.out.println("Veuillez saisir une commande :");
+        String command = scanner.nextLine().trim();
 
-        while (true) {
-            String command = scanner.nextLine().trim();
-
-            // Vérifie si la commande saisie commence par l'une des commandes valides
-            boolean commandeAvailable = getListeCommande().stream()
+        // Vérifie si la commande saisie commence par l'une des commandes valides
+        boolean commandeAvailable = getListeCommande().stream()
                     .anyMatch(command::startsWith);
 
-            if (commandeAvailable) {
-                return command;
-            }
-
-            System.out.print("Commande invalide. Veuillez réessayer.\n(Commandes existantes : ");
-            System.out.println(String.join(", ", getListeCommande()) + ")");
+        if (commandeAvailable) {
+            return command;
         }
+        throw new IllegalArgumentException("Commande invalide. Veuillez réessayer.\n(Commandes existantes : " + String.join(", ", getListeCommande()) + ")");
     }
 
     /**

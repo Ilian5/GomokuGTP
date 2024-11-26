@@ -47,7 +47,11 @@ public class Game {
      */
     public void jouePartie() { //Permet de jouer une partie
         do {
-            executeCommande(io.getCommande());
+            try {
+                executeCommande(io.getCommande());
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
         } while (!checkPartieFinie());
     }
 
@@ -55,7 +59,7 @@ public class Game {
      * Exécute la commande entrée par l'utilisateur en fonction de l'action spécifiée.
      * @param commande La commande entrée par l'utilisateur.
      */
-    protected void executeCommande(String commande) {
+    protected void executeCommande(String commande) throws IllegalArgumentException {
         String[] parts = commande.split(" ", 2);
         String action = parts[0];
         String argument = parts.length > 1 ? parts[1] : null;
@@ -73,24 +77,19 @@ public class Game {
                 System.out.println(board);
                 break;
             case "play":
-                if (argument != null) {
-                    gameStarted = true;
-                    playTour(commande);
-                } else {
-                    System.out.println("Erreur : Argument manquant pour la commande 'play'.");
-                }
+                gameStarted = true;
+                playTour(commande);
                 break;
             case "partiestop":
                 if (gameStarted) {
                     gameStarted = false;
                     System.out.println("Partie arrêtée.");
                 } else {
-                    System.out.println("Erreur : Aucune partie en cours à arrêter.");
+                    throw new IllegalArgumentException("Erreur : Aucune partie en cours à arrêter.");
                 }
                 break;
             default:
-                System.out.println("Commande inconnue : " + action);
-                break;
+                throw new IllegalArgumentException("Commande inconnue : " + action);
         }
     }
 
@@ -110,7 +109,6 @@ public class Game {
         }
         try {
             taille = Integer.parseInt(argument);
-            assert  taille <= TAILLE_DEFAULT && taille >= NB_BOULE_ALIGNE;
             board = new Board(taille);
             gameStarted = true;
         } catch (NumberFormatException e) {
@@ -123,35 +121,23 @@ public class Game {
      * @param commande La commande contenant la couleur et la position du mouvement.
      */
     private void playTour(String commande) throws IllegalArgumentException {
-        try {
-            String[] parts = commande.toUpperCase().split(" ");
-        if(parts.length != 3) {
-            System.out.println("Commande incorrecte, veuillez entrer une couleur et un mouvement !");
-            return;
-        }
+        String[] parts = commande.toUpperCase().split(" ");
+        if(parts.length != 3)
+            throw new IllegalArgumentException("Commande incorrecte, veuillez entrer une couleur et un mouvement !");
         char color = parts[1].charAt(0);
         String mouvement = parts[2];
 
-        if(color != 'B' && color != 'W') {
-            System.out.println("Couleur incorrect, couleur possible : B (Black) | W (White)");
-            return;
-        }
-        if(!isMouvementPossible(mouvement)) {
-            System.out.println("Mouvement incorrect, Mouvement disponible compris entre A0 et " +
+        if(color != 'B' && color != 'W')
+            throw new IllegalArgumentException("Couleur incorrect, couleur possible : B (Black) | W (White)");
+        if(!isMouvementPossible(mouvement))
+            throw new IllegalArgumentException("Mouvement incorrect, Mouvement disponible compris entre A0 et " +
                     ((char) ('A' + taille - 1)) + (taille - 1) + "\n" + getMouvementDisponible());
-            return;
-        }
-        if(!isPositionNonOccupee(mouvement)) {
-            System.out.println("Mouvement impossible, une boule est déjà à ces coordonnées !");
-            return;
-        }
+        if(!isPositionNonOccupee(mouvement))
+            throw new IllegalArgumentException("Mouvement impossible, une boule est déjà à ces coordonnées !");
+
         Coordonnees coord = new Coordonnees((int) mouvement.charAt(0) - 'A', Integer.parseInt(mouvement.substring(1)));
         Color bouleColor = (color == 'B' ? Color.Black : Color.White);
         board.addBoule(new Boule(coord, bouleColor));
-        }
-        catch(IllegalArgumentException e) {
-            throw  new IllegalArgumentException("Commande inexistant : " + commande);
-        }
     }
 
     /**

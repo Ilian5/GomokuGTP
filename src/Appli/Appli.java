@@ -8,3 +8,4 @@ public class Appli {
         new Game().startSession();
     }
 }
+
