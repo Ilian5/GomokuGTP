@@ -131,7 +131,7 @@ public class Game {
         if(!isPositionNonOccupee(mouvement))
             throw new IllegalArgumentException("Mouvement impossible, une boule est déjà à ces coordonnées !");
 
-        Coordonnees coord = new Coordonnees((int) mouvement.charAt(0) - 'A', Integer.parseInt(mouvement.substring(1)));
+        Coordonnees coord = new Coordonnees(Integer.parseInt(mouvement.substring(1)), (int) mouvement.charAt(0) - 'A');
         Color bouleColor = (color == 'B' ? Color.Black : Color.White);
         board.addBoule(new Boule(coord, bouleColor));
     }

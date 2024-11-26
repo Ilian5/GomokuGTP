@@ -2,8 +2,8 @@ package Utils;
 
 public enum Color {
 
-    Black('B'),
-    White('W');
+    Black('X'),
+    White('O');
 
     private char color;
 
