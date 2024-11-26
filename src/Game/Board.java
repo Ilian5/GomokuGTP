@@ -39,24 +39,25 @@ public class Board {
     }
 
     public String toString() {
-        StringBuilder s = new StringBuilder("  ");
+        StringBuilder s = new StringBuilder("   ");
         reloadBoule();
         for(int i = 0; i < taille; i++) {
-            s.append(i < 10 ? " " : "").append(i).append(" ");
+            char letter = (char) ('A' + i);
+            s.append(letter).append("  ");
         }
         s.append("\n");
 
         for (int i = 0; i < taille; i++) {
-            char letter = (char) ('A' + i);
-            s.append(letter).append(" ");
+            s.append(i).append(i < 10 ? " " : "");
             for (int j = 0; j < taille; j++) {
                 s.append(" ").append(grille[i][j]).append(" ");
             }
-            s.append(" ").append(letter).append("\n");
+            s.append(i < 10 ? " " : "").append(i).append("\n");
         }
-        s.append("  ");
+        s.append("   ");
         for(int i = 0; i < taille; i++) {
-            s.append(i < 10 ? " " : "").append(i).append(" ");
+            char letter = (char) ('A' + i);
+            s.append(letter).append("  ");
         }
         return s.toString();
     }
