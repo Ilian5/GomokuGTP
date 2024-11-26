@@ -83,6 +83,7 @@ public class Game {
             case "partiestop":
                 if (gameStarted) {
                     gameStarted = false;
+                    board = new Board(taille);
                     System.out.println("Partie arrêtée.");
                 } else {
                     throw new IllegalArgumentException("Erreur : Aucune partie en cours à arrêter.");
@@ -99,18 +100,13 @@ public class Game {
      */
     private void commandBoardSize(String argument) throws NumberFormatException {
 
-        if (gameStarted) {
-            System.out.println("Une partie est déjà en cours ! Veuillez la terminer ou y mettre fin (partiestop) !");
-            return;
-        }
-        if (argument == null) {
-            System.out.println("Erreur : Aucun argument fourni pour la taille.");
-            return;
-        }
+        if (gameStarted)
+            throw new NumberFormatException("Une partie est déjà en cours ! Veuillez la terminer ou y mettre fin (partiestop) !");
+        if (argument == null)
+            throw new NumberFormatException("Erreur : Aucun argument fourni pour la taille.");
         try {
             taille = Integer.parseInt(argument);
             board = new Board(taille);
-            gameStarted = true;
         } catch (NumberFormatException e) {
             throw new NumberFormatException("Erreur : " + argument + " pour la taille.Veuillez entrer un entier.");
         }

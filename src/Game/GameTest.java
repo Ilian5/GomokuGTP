@@ -11,7 +11,6 @@ public class GameTest {
 
     private Game gameTest = new Game ();
     public GameTest() {
-       // gameTest.executeCommande("boardsize " + TAILLE_BOARD_TEST);
     }
 
     @Test
@@ -39,9 +38,10 @@ public class GameTest {
     @Test
     public void testTailleInvalide() {
         assertThrows(NumberFormatException.class, () ->{
+            gameTest.executeCommande("play b d5");
             gameTest.executeCommande("partiestop");
             gameTest.executeCommande("boardsize d");
-        },"taille de plateau invalide.");
+        },"Taille de plateau invalide.");
     }
 
 

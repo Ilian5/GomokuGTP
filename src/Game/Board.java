@@ -52,7 +52,11 @@ public class Board {
             for (int j = 0; j < taille; j++) {
                 s.append(" ").append(grille[i][j]).append(" ");
             }
-            s.append("\n");
+            s.append(" ").append(letter).append("\n");
+        }
+        s.append("  ");
+        for(int i = 0; i < taille; i++) {
+            s.append(i < 10 ? " " : "").append(i).append(" ");
         }
         return s.toString();
     }
