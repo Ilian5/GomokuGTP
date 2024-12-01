@@ -8,236 +8,188 @@ import Utils.IO;
 
 import java.util.Random;
 
-/**
- * La classe {@code Game} gère une session de jeu, permettant aux joueurs de jouer au jeu Gomoku.
- * Elle permet de démarrer une partie, exécuter des commandes, et de gérer l'état du jeu.
- */
+
 public class Game {
 
-    private static final int TAILLE_DEFAULT = 19; //Taille du plateau par défaut
-    private static final int NB_BOULE_ALIGNE = 5; //Nombre de boules à aligner pour gagner
+    private static final int TAILLE_DEFAULT = 19; // Taille par défaut du plateau (19x19).
 
-    private Board board;
-    private final IO io;
-    private final Random random;
-    private int taille;
-    private int nbrMoves;
-    private boolean gameFinished;
-    private boolean gameStarted;
 
-    /**
-     * Constructeur de la classe {@code Game}. Initialise le plateau de jeu, la taille par défaut,
-     * et crée une instance de {@code IO} pour la gestion des entrées utilisateur.
-     */
+    private Board board; //Plateau de jeu.
+    private final Random random; //Générateur de nombres aléatoires pour les mouvements automatiques.
+    private final IO io; //Gestionnaire des entrées/sorties.
+    private int taille; //Taille actuelle du plateau.
+    private int nbCommande;
+
     public Game() {
         this.taille = TAILLE_DEFAULT;
+        this.board = new Board(taille);
         this.io = new IO();
         this.random = new Random();
-        this.gameFinished = false;
-        this.gameStarted = false;
-        nbrMoves = 0;
+        this.nbCommande = 1;
     }
 
     /**
-     * Démarre une nouvelle session de jeu. La taille du plateau est déterminée par l'utilisateur.
+     * Démarre une session GTP. Attend les commandes du joueur via la console
+     * et répond en fonction des actions demandées.
      */
     public void startSession() {
-        this.board = new Board(taille);
-        jouePartie();
-    }
-
-
-    /**
-     * Permet de jouer une partie en boucle, en exécutant les commandes de l'utilisateur jusqu'à ce que la partie soit terminée.
-     */
-    public void jouePartie() { //Permet de jouer une partie
-        do {
+        boolean running = true;
+        while (running) {
+            String command = io.getCommande(nbCommande).trim();
+            if (command.isEmpty()) continue;
             try {
-                ++nbrMoves;
-                executeCommande(io.getCommande());
+                running = executeCommand(command);
+                if(!command.startsWith("genmove"))
+                    io.sendResponse("=" + nbCommande);
             } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
+                io.sendError(e.getMessage(), nbCommande);
             }
-        } while (!checkPartieFinie());
+            nbCommande++;
+        }
     }
 
     /**
-     * Exécute la commande entrée par l'utilisateur en fonction de l'action spécifiée.
-     * @param commande La commande entrée par l'utilisateur.
+     * Exécute une commande GTP reçue en entrée.
+     * @param command La commande sous forme de chaîne (exemple : "play B D5").
+     * @return {@code false} si la commande est `quit` (fin de session), {@code true} sinon.
+     * @throws IllegalArgumentException si la commande est invalide.
      */
-    protected void executeCommande(String commande) throws IllegalArgumentException {
-        String[] parts = commande.split(" ", 2);
-        String action = parts[0];
+    private boolean executeCommand(String command) {
+        String[] parts = command.split(" ");
+        String action = parts[0].toLowerCase(); // Première partie de la commande (action).
         String argument = parts.length > 1 ? parts[1] : null;
+
         switch (action) {
-            case "quit":
-                System.exit(0);
-            case "boardsize":
-                try {
-                    commandBoardSize(argument);
-                } catch (NumberFormatException e) {
-                    System.out.println(e.getMessage());
-                }
-                break;
-            case "clearboard":
-                board = new Board(taille);
-                break;
-            case "showboard":
-                System.out.println(board);
-                break;
-            case "play":
-                gameStarted = true;
-                try {
-                    playTour(commande);
-                } catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
-                }
-                break;
-            case "partiestop":
-                if (gameStarted) {
-                    gameStarted = false;
-                    board = new Board(taille);
-                    System.out.println("Partie arrêtée.");
-                } else {
-                    throw new IllegalArgumentException("Erreur : Aucune partie en cours à arrêter.");
-                }
-                break;
-            case "genmove":
-                try {
-                    genMove();
-                } catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
-                }
-                break;
-            default:
-                throw new IllegalArgumentException("Commande inconnue : " + action);
+            case "boardsize" -> setBoardSize(argument);
+            case "clear_board" -> clearBoard();
+            case "play" -> playMove(parts);
+            case "genmove" -> generateMove(argument);
+            case "showboard" -> showBoard();
+            case "quit" -> {return false;}
+            default -> throw new IllegalArgumentException("invalid command");
         }
+        return true;
     }
 
     /**
-     * Définit la taille du plateau de jeu si aucune partie n'a commencé.
-     * @param argument Taille du plateau sous forme de chaîne de caractères.
+     * Définit la taille du plateau de jeu.
+     * @param argument Taille du plateau sous forme de chaîne (exemple : "19").
+     * @throws IllegalArgumentException si la taille est invalide (en dehors de [5, 19]).
      */
-    private void commandBoardSize(String argument) throws NumberFormatException {
-        if (gameStarted)
-            throw new NumberFormatException("Une partie est déjà en cours ! Veuillez la terminer ou y mettre fin (partiestop) !");
-        if (argument == null)
-            throw new NumberFormatException(nbrMoves + "? board size outside engine's limits");
+    private void setBoardSize(String argument) {
         try {
-            taille = Integer.parseInt(argument);
-            board = new Board(taille);
+            int newTaille = Integer.parseInt(argument);
+            if (newTaille < 5 || newTaille > 19) {
+                throw new IllegalArgumentException("board size outside engine's limits");
+            }
+            this.taille = newTaille;
+            this.board = new Board(taille);
         } catch (NumberFormatException e) {
-            throw new NumberFormatException(nbrMoves + "? board size outside engine's limits");
+            throw new IllegalArgumentException("board size outside engine's limits");
         }
     }
 
     /**
-     * Joue un tour de jeu en vérifiant la validité du mouvement avant de l'appliquer.
-     * @param commande La commande contenant la couleur et la position du mouvement.
+     * Réinitialise le plateau à un état vide.
      */
-    private void playTour(String commande) throws IllegalArgumentException {
-        String[] parts = commande.toUpperCase().split(" ");
-        if(parts.length != 3)
-            throw new IllegalArgumentException(nbrMoves + "? invalid vertex, illegal move");
-        char color = parts[1].charAt(0);
-        String mouvement = parts[2];
-
-        if(color != 'B' && color != 'W')
-            throw new IllegalArgumentException(nbrMoves + "? invalid color");
-        if(!isMouvementPossible(mouvement))
-            throw new IllegalArgumentException(nbrMoves + "? invalid vertex, illegal move");
-        if(!isPositionNonOccupee(mouvement))
-            throw new IllegalArgumentException(nbrMoves + "? invalid vertex, illegal move");
-
-        Coordonnees coord = new Coordonnees(Integer.parseInt(mouvement.substring(1)), (int) mouvement.charAt(0) - 'A');
-        Color bouleColor = (color == 'B' ? Color.Black : Color.White);
-        board.addBoule(new Boule(coord, bouleColor));
+    private void clearBoard() {
+        this.board = new Board(taille);
     }
 
     /**
-     * Joue un mouvement aléatoire sur le plateau.
+     * Joue un coup sur le plateau.
+     * @param parts Commande décomposée en parties (exemple : ["play", "B", "D5"]).
+     * @throws IllegalArgumentException si la commande est mal formée ou si la position est occupée.
      */
-    private void genMove() {
-        Coordonnees coor = createMoveRandom();
-        Color color = (random.nextInt(2) == 0 ? Color.Black : Color.White);
-        board.addBoule(new Boule(coor, color));
-    }
-
-    /**
-     * Vérifie si le mouvement est possible sur le plateau, c'est-à-dire si les coordonnées sont valides.
-     * @param mouvement Le mouvement sous forme de chaîne (ex: "A1").
-     * @return {@code true} si le mouvement est valide, {@code false} sinon.
-     */
-    private boolean isMouvementPossible(String mouvement) {
-        if (mouvement.isEmpty() || mouvement.charAt(0) < 'A' || mouvement.charAt(0) > 'A' + taille - 1) {
-            return false;
+    private void playMove(String[] parts) {
+        if (parts.length < 3) {
+            throw new IllegalArgumentException("Invalid command. Use : play <color> <vertex>");
         }
+        Color color = checkColorValid(parts[1]); // Analyse la couleur (B ou W).
+        Coordonnees coord = checkCoordinatesValid(parts[2].toUpperCase()); // Analyse les coordonnées.
+
+        if (board.isOccupied(coord)) {
+            throw new IllegalArgumentException("Illegal move");
+        }
+        board.addBoule(new Boule(coord, color));
+    }
+
+    /**
+     * Génère un mouvement aléatoire pour une couleur donnée.
+     * @param colorArg Couleur pour laquelle générer un mouvement (exemple : "B").
+     * @throws IllegalArgumentException si la couleur est invalide.
+     */
+    private void generateMove(String colorArg) {
+        Color color = checkColorValid(colorArg);
+        Coordonnees randomMove = findRandomEmptyCell(); // Trouve une case vide au hasard.
+        board.addBoule(new Boule(randomMove, color)); // Place une boule à cette position.
+        io.sendResponse("=" + nbCommande + " " + formatCoordinates(randomMove));
+    }
+
+    /**
+     * Affiche le plateau dans le format GTP.
+     */
+    private void showBoard() {
+        io.sendResponse(board.toString());
+    }
+
+    // --- Méthodes utilitaires ---
+
+    /**
+     * Analyse la couleur à partir d'une chaîne.
+     * @param colorArg Chaîne représentant la couleur (exemple : "B" ou "W").
+     * @return {@code Color.Black} ou {@code Color.White}.
+     * @throws IllegalArgumentException si la couleur est invalide.
+     */
+    private Color checkColorValid(String colorArg) {
+        return switch (colorArg.toUpperCase()) {
+            case "BLACK" -> Color.Black;
+            case "WHITE" -> Color.White;
+            default -> throw new IllegalArgumentException("Invalid Color");
+        };
+    }
+
+    /**
+     * Analyse une position sous forme de chaîne en coordonnées.
+     * @param input Position en notation GTP (exemple : "D5").
+     * @return Objet {@code Coordonnees} correspondant à la position.
+     * @throws IllegalArgumentException si la position est invalide.
+     */
+    private Coordonnees checkCoordinatesValid(String input) {
+        if (input.isEmpty() || input.charAt(0) < 'A' || input.charAt(0) >= 'A' + taille - 1) {
+            throw new IllegalArgumentException("Invalid vertex");
+        }
+        int x = input.charAt(0) - 'A'; // Colonne.
         try {
-            int mouvementChiffre = Integer.parseInt(mouvement.substring(1));
-            return mouvementChiffre >= 0 && mouvementChiffre < taille;
+            int y = Integer.parseInt(input.substring(1)) - 1; // Ligne.
+            if (y < 0 || y >= taille) {
+                throw new IllegalArgumentException("Invalid vertex");
+            }
+            return new Coordonnees(x, y);
         } catch (NumberFormatException e) {
-            return false;
+            throw new IllegalArgumentException("Invalid vertex");
         }
     }
 
-
     /**
-     * Vérifie si la position donnée par le mouvement est déjà occupée par une boule.
-     * @param mouvement Le mouvement sous forme de chaîne (ex: "A1").
-     * @return {@code true} si la position est libre, {@code false} si elle est occupée.
+     * Formate des coordonnées en notation GTP.
+     * @param coord Objet {@code Coordonnees}.
+     * @return Position au format GTP (exemple : "D5").
      */
-    private boolean isPositionNonOccupee(String mouvement) {
-        int mouvementLettre = mouvement.charAt(0) - 'A';
-        int mouvementChiffre;
-
-        try {
-            mouvementChiffre = Integer.parseInt(mouvement.substring(1));
-        } catch (NumberFormatException e) {
-            // Si le mouvement est invalide, retourne false immédiatement
-            return false;
-        }
-
-        return board.getBoule().stream()
-                .noneMatch(b -> b.getCoordonnees().getX() == mouvementLettre &&
-                        b.getCoordonnees().getY() == mouvementChiffre);
+    private String formatCoordinates(Coordonnees coord) {
+        return (char) ('A' + coord.getX()) + Integer.toString(coord.getY() + 1);
     }
 
     /**
-     * Vérifie si la partie est terminée.
-     * @return {@code true} si la partie est terminée, {@code false} sinon.
+     * Trouve une cellule vide aléatoire sur le plateau.
+     * @return Coordonnées d'une cellule vide.
      */
-    protected boolean checkPartieFinie() { //vérifie que la partie est fini
-        return gameFinished;
-    }
-
-    /**
-     * Génère et retourne un tableau de valeur représentant les mouvements disponibles sur le plateau.
-     * @return Tableau contenant les mouvements disponibles.
-     */
-    private Coordonnees createMoveRandom() {
-        int randomX, randomY;
+    private Coordonnees findRandomEmptyCell() {
+        int x, y;
         do {
-            randomX = random.nextInt(taille);
-            randomY = random.nextInt(taille);
-        } while (board.getGrille()[randomX][randomY] != '.');
-        return new Coordonnees(randomX, randomY);
-    }
-
-    /**
-     * Récupérer la taille du Board.
-     */
-    protected int getTaille() {
-        return taille;
-    }
-
-    /**
-     * Définir une taille pour le Board.
-     */
-    protected void setTaille(int taille) {
-        this.taille = taille;
-    }
-
-    protected Board getBoard() {
-        return board;
+            x = random.nextInt(taille);
+            y = random.nextInt(taille);
+        } while (board.isOccupied(new Coordonnees(x, y)));
+        return new Coordonnees(x, y);
     }
 }

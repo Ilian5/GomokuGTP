@@ -10,68 +10,68 @@ public class GameTest {
     private static final int TAILLE_BOARD_TEST = 6;
 
     private Game gameTest;
-    public GameTest() {
-        this.gameTest = new Game();
-        gameTest.setTaille(TAILLE_BOARD_TEST);
-    }
-
-    @Test
-    public void testBoardSize() {
-        gameTest.executeCommande("boardsize 5");
-        assertEquals(5, gameTest.getTaille(), "La taille devrait être 5.");
-    }
-
-
-    @Test public void testBoardSizePetite(){
-        assertThrows(AssertionError.class, () ->{
-            gameTest.executeCommande("partiestop");
-            gameTest.executeCommande("boardsize 1");
-        },"La taille du plateau est trop petit 1 la taille doit etre superieur = a 5");
-    }
-
-
-    @Test public void testBoardSizeGrand(){
-        assertThrows(AssertionError.class, () ->{
-            gameTest.executeCommande("partiestop");
-            gameTest.executeCommande("boardsize 25");
-        },"La taille du plateau est trop grand 25 la taille doit etre inferieur = a 19");
-    }
-
-    @Test
-    public void testTailleInvalide() {
-        assertThrows(NumberFormatException.class, () ->{
-            gameTest.executeCommande("play b d5");
-            gameTest.executeCommande("partiestop");
-            gameTest.executeCommande("boardsize d");
-        },"Taille de plateau invalide.");
-    }
-
-
-
-    @Test
-    public void testShowBoard() {
-        gameTest.executeCommande("boardsize " + TAILLE_BOARD_TEST);
-        gameTest.executeCommande("showboard");
-        assertNotNull(gameTest.getBoard().toString(), "Le plateau devrait être affiché.");
-    }
-
-
-    @Test
-    public void testQuitCommand() {
-        gameTest.executeCommande("quit");
-        assertTrue(gameTest.checkPartieFinie(), "La commande 'quit' devrait terminer la partie.");
-    }
-
-    @Test
-    public void testInvalideFormatPlayCommand() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            gameTest.executeCommande("play D5");
-        }, "Une IllegalArgumentException devrait être levée pour une commande mal ecrite (color).");
-    }
-
-
-
-
+//    public GameTest() {
+//        this.gameTest = new Game();
+//        gameTest.setTaille(TAILLE_BOARD_TEST);
+//    }
+//
+//    @Test
+//    public void testBoardSize() {
+//        gameTest.executeCommande("boardsize 5");
+//        assertEquals(5, gameTest.getTaille(), "La taille devrait être 5.");
+//    }
+//
+//
+//    @Test public void testBoardSizePetite(){
+//        assertThrows(AssertionError.class, () ->{
+//            gameTest.executeCommande("partiestop");
+//            gameTest.executeCommande("boardsize 1");
+//        },"La taille du plateau est trop petit 1 la taille doit etre superieur = a 5");
+//    }
+//
+//
+//    @Test public void testBoardSizeGrand(){
+//        assertThrows(AssertionError.class, () ->{
+//            gameTest.executeCommande("partiestop");
+//            gameTest.executeCommande("boardsize 25");
+//        },"La taille du plateau est trop grand 25 la taille doit etre inferieur = a 19");
+//    }
+//
+//    @Test
+//    public void testTailleInvalide() {
+//        assertThrows(NumberFormatException.class, () ->{
+//            gameTest.executeCommande("play b d5");
+//            gameTest.executeCommande("partiestop");
+//            gameTest.executeCommande("boardsize d");
+//        },"Taille de plateau invalide.");
+//    }
+//
+//
+//
+//    @Test
+//    public void testShowBoard() {
+//        gameTest.executeCommande("boardsize " + TAILLE_BOARD_TEST);
+//        gameTest.executeCommande("showboard");
+//        assertNotNull(gameTest.getBoard().toString(), "Le plateau devrait être affiché.");
+//    }
+//
+//
+//    @Test
+//    public void testQuitCommand() {
+//        gameTest.executeCommande("quit");
+//        assertTrue(gameTest.checkPartieFinie(), "La commande 'quit' devrait terminer la partie.");
+//    }
+//
+//    @Test
+//    public void testInvalideFormatPlayCommand() {
+//        assertThrows(IllegalArgumentException.class, () -> {
+//            gameTest.executeCommande("play D5");
+//        }, "Une IllegalArgumentException devrait être levée pour une commande mal ecrite (color).");
+//    }
+//
+//
+//
+//
 
 //    @Test
 //    public void testPlay(){

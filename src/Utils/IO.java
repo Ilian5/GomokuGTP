@@ -1,29 +1,15 @@
 package Utils;
 
-import java.util.List;
 import java.util.Scanner;
 
 /**
- * La classe {@code IO} gère les entrées et sorties de commandes de l'utilisateur dans la console.
- * Elle permet d'afficher des messages et de récupérer des commandes saisies par l'utilisateur,
- * tout en vérifiant leur validité à partir d'une liste prédéfinie de commandes valides.
+ * La classe {@code IO} gère les entrées et sorties de commandes GTP de l'utilisateur dans la console.
+ * Elle permet d'afficher des messages et de récupérer des commandes saisies par l'utilisateur.
+ * Elle implémente le protocole GTP pour interagir avec le moteur Gomoku.
  */
 public class IO {
 
     private final Scanner scanner;
-
-    /**
-     * Liste statique des commandes valides que l'utilisateur peut saisir.
-     */
-    private static final List<String> LISTE_COMMANDE = List.of(
-            "quit",
-            "boardsize",
-            "clearboard",
-            "showboard",
-            "play",
-            "partiestop",
-            "genmove"
-    );
 
     /**
      * Constructeur de la classe {@code IO}.
@@ -34,32 +20,30 @@ public class IO {
     }
 
     /**
-     * Retourne la liste des commandes valides.
+     * Demande à l'utilisateur de saisir une commande et retourne la saisie de l'utilisateur.
+     * Le protocole GTP utilise des commandes spécifiques pour interagir avec le moteur.
      *
-     * @return La liste des commandes valides.
+     * @return La commande saisie par l'utilisateur sous forme de chaîne.
      */
-    public List<String> getListeCommande() {
-        return LISTE_COMMANDE;
+    public String getCommande(int nbCommande) {
+        System.out.print(nbCommande + " ");  // Affiche un prompt pour l'utilisateur
+        return scanner.nextLine().trim();
     }
 
     /**
-     * Demande à l'utilisateur de saisir une commande et vérifie si la commande est valide.
-     * Si la commande est invalide, l'utilisateur est invité à réessayer.
-     * La commande doit commencer par l'une des commandes valides de {@code LISTE_COMMANDE}.
-     *
-     * @return La commande saisie et validée par l'utilisateur.
+     * Envoie une réponse au moteur selon le format GTP.
+     * Le moteur Gomoku doit répondre à une commande GTP de manière appropriée.
+     * @param response La réponse à envoyer au moteur (par exemple, "= move played").
      */
-    public String getCommande() throws IllegalArgumentException {
-        System.out.println("Veuillez saisir une commande :");
-        String command = scanner.nextLine().trim();
+    public void sendResponse(String response) {
+        System.out.println(response + "\n");
+    }
 
-        // Vérifie si la commande saisie commence par l'une des commandes valides
-        boolean commandeAvailable = getListeCommande().stream()
-                    .anyMatch(command::startsWith);
-
-        if (commandeAvailable) {
-            return command;
-        }
-        throw new IllegalArgumentException("Commande invalide. Veuillez réessayer.\n(Commandes existantes : " + String.join(", ", getListeCommande()) + ")");
+    /**
+     * Envoie une erreur au moteur si la commande est invalide ou a échoué.
+     * @param errorMessage Le message d'erreur à envoyer.
+     */
+    public void sendError(String errorMessage, int nbCommande) {
+        System.out.println("?" + nbCommande + " " + errorMessage + "\n");
     }
 }
