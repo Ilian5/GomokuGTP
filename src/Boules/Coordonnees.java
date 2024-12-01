@@ -1,4 +1,4 @@
-package Game;
+package Boules;
 
 public class Coordonnees {
     private int x;

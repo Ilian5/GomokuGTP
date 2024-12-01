@@ -1,7 +1,12 @@
 package Game;
 
+import Board.Board;
+import Boules.Boule;
+import Boules.Coordonnees;
 import Utils.Color;
 import Utils.IO;
+
+import java.util.Random;
 
 /**
  * La classe {@code Game} gère une session de jeu, permettant aux joueurs de jouer au jeu Gomoku.
@@ -12,13 +17,11 @@ public class Game {
     private static final int TAILLE_DEFAULT = 19; //Taille du plateau par défaut
     private static final int NB_BOULE_ALIGNE = 5; //Nombre de boules à aligner pour gagner
 
-    public Board getBoard() {
-        return board;
-    }
-
     private Board board;
     private final IO io;
+    private final Random random;
     private int taille;
+    private int nbrMoves;
     private boolean gameFinished;
     private boolean gameStarted;
 
@@ -29,18 +32,20 @@ public class Game {
     public Game() {
         this.taille = TAILLE_DEFAULT;
         this.io = new IO();
+        this.random = new Random();
         this.gameFinished = false;
         this.gameStarted = false;
+        nbrMoves = 0;
     }
 
     /**
      * Démarre une nouvelle session de jeu. La taille du plateau est déterminée par l'utilisateur.
      */
     public void startSession() {
-        taille = io.getTailleDebutPartie();
         this.board = new Board(taille);
         jouePartie();
     }
+
 
     /**
      * Permet de jouer une partie en boucle, en exécutant les commandes de l'utilisateur jusqu'à ce que la partie soit terminée.
@@ -48,6 +53,7 @@ public class Game {
     public void jouePartie() { //Permet de jouer une partie
         do {
             try {
+                ++nbrMoves;
                 executeCommande(io.getCommande());
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
@@ -65,10 +71,13 @@ public class Game {
         String argument = parts.length > 1 ? parts[1] : null;
         switch (action) {
             case "quit":
-                gameFinished = true;
-                break;
+                System.exit(0);
             case "boardsize":
-                commandBoardSize(argument);
+                try {
+                    commandBoardSize(argument);
+                } catch (NumberFormatException e) {
+                    System.out.println(e.getMessage());
+                }
                 break;
             case "clearboard":
                 board = new Board(taille);
@@ -78,7 +87,11 @@ public class Game {
                 break;
             case "play":
                 gameStarted = true;
-                playTour(commande);
+                try {
+                    playTour(commande);
+                } catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
+                }
                 break;
             case "partiestop":
                 if (gameStarted) {
@@ -87,6 +100,13 @@ public class Game {
                     System.out.println("Partie arrêtée.");
                 } else {
                     throw new IllegalArgumentException("Erreur : Aucune partie en cours à arrêter.");
+                }
+                break;
+            case "genmove":
+                try {
+                    genMove();
+                } catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
                 }
                 break;
             default:
@@ -99,16 +119,15 @@ public class Game {
      * @param argument Taille du plateau sous forme de chaîne de caractères.
      */
     private void commandBoardSize(String argument) throws NumberFormatException {
-
         if (gameStarted)
             throw new NumberFormatException("Une partie est déjà en cours ! Veuillez la terminer ou y mettre fin (partiestop) !");
         if (argument == null)
-            throw new NumberFormatException("Erreur : Aucun argument fourni pour la taille.");
+            throw new NumberFormatException(nbrMoves + "? board size outside engine's limits");
         try {
             taille = Integer.parseInt(argument);
             board = new Board(taille);
         } catch (NumberFormatException e) {
-            throw new NumberFormatException("Erreur : " + argument + " pour la taille.Veuillez entrer un entier.");
+            throw new NumberFormatException(nbrMoves + "? board size outside engine's limits");
         }
     }
 
@@ -119,21 +138,29 @@ public class Game {
     private void playTour(String commande) throws IllegalArgumentException {
         String[] parts = commande.toUpperCase().split(" ");
         if(parts.length != 3)
-            throw new IllegalArgumentException("Commande incorrecte, veuillez entrer une couleur et un mouvement !");
+            throw new IllegalArgumentException(nbrMoves + "? invalid vertex, illegal move");
         char color = parts[1].charAt(0);
         String mouvement = parts[2];
 
         if(color != 'B' && color != 'W')
-            throw new IllegalArgumentException("Couleur incorrect, couleur possible : B (Black) | W (White)");
+            throw new IllegalArgumentException(nbrMoves + "? invalid color");
         if(!isMouvementPossible(mouvement))
-            throw new IllegalArgumentException("Mouvement incorrect, Mouvement disponible compris entre A0 et " +
-                    ((char) ('A' + taille - 1)) + (taille - 1) + "\n" + getMouvementDisponible());
+            throw new IllegalArgumentException(nbrMoves + "? invalid vertex, illegal move");
         if(!isPositionNonOccupee(mouvement))
-            throw new IllegalArgumentException("Mouvement impossible, une boule est déjà à ces coordonnées !");
+            throw new IllegalArgumentException(nbrMoves + "? invalid vertex, illegal move");
 
         Coordonnees coord = new Coordonnees(Integer.parseInt(mouvement.substring(1)), (int) mouvement.charAt(0) - 'A');
         Color bouleColor = (color == 'B' ? Color.Black : Color.White);
         board.addBoule(new Boule(coord, bouleColor));
+    }
+
+    /**
+     * Joue un mouvement aléatoire sur le plateau.
+     */
+    private void genMove() {
+        Coordonnees coor = createMoveRandom();
+        Color color = (random.nextInt(2) == 0 ? Color.Black : Color.White);
+        board.addBoule(new Boule(coor, color));
     }
 
     /**
@@ -184,26 +211,33 @@ public class Game {
     }
 
     /**
-     * Génère et retourne une chaîne représentant les mouvements disponibles sur le plateau.
-     * @return Une chaîne contenant les mouvements disponibles.
+     * Génère et retourne un tableau de valeur représentant les mouvements disponibles sur le plateau.
+     * @return Tableau contenant les mouvements disponibles.
      */
-    private String getMouvementDisponible() {
-        StringBuilder s = new StringBuilder("[\n");
-        for(int i = 0; i < taille; ++i){
-            for(int j = 0; j < taille; ++j) {
-                if(board.getGrille()[i][j] == '.') {
-                    s.append((char) ('A' + i)).append(j).append((j == taille - 1 ? "" : ","));
-                }
-            }
-            s.append("\n");
-        }
-        s.append("]\n");
-        return s.toString();
+    private Coordonnees createMoveRandom() {
+        int randomX, randomY;
+        do {
+            randomX = random.nextInt(taille);
+            randomY = random.nextInt(taille);
+        } while (board.getGrille()[randomX][randomY] != '.');
+        return new Coordonnees(randomX, randomY);
     }
 
-
+    /**
+     * Récupérer la taille du Board.
+     */
     protected int getTaille() {
         return taille;
     }
 
+    /**
+     * Définir une taille pour le Board.
+     */
+    protected void setTaille(int taille) {
+        this.taille = taille;
+    }
+
+    protected Board getBoard() {
+        return board;
+    }
 }

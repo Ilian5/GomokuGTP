@@ -1,4 +1,4 @@
-package Game;
+package Boules;
 
 import Utils.Color;
 

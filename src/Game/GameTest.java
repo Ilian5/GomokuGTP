@@ -9,8 +9,10 @@ public class GameTest {
     private final int TAILLE_GOMOKU_MIN = 5;
     private static final int TAILLE_BOARD_TEST = 6;
 
-    private Game gameTest = new Game ();
+    private Game gameTest;
     public GameTest() {
+        this.gameTest = new Game();
+        gameTest.setTaille(TAILLE_BOARD_TEST);
     }
 
     @Test

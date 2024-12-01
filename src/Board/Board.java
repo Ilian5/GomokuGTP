@@ -1,6 +1,7 @@
-package Game;
+package Board;
 
-import java.lang.reflect.Array;
+import Boules.Boule;
+
 import java.util.ArrayList;
 
 public class Board {
