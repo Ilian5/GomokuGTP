@@ -54,7 +54,7 @@ public class Game {
      * @return {@code false} si la commande est `quit` (fin de session), {@code true} sinon.
      * @throws IllegalArgumentException si la commande est invalide.
      */
-    private boolean executeCommand(String command) {
+    public boolean executeCommand(String command) {
         String[] parts = command.split(" ");
         String action = parts[0].toLowerCase(); // Première partie de la commande (action).
         String argument = parts.length > 1 ? parts[1] : null;
@@ -191,5 +191,9 @@ public class Game {
             y = random.nextInt(taille);
         } while (board.isOccupied(new Coordonnees(x, y)));
         return new Coordonnees(x, y);
+    }
+
+    public int getBoardSize() {
+        return taille;
     }
 }
