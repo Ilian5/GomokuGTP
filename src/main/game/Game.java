@@ -1,10 +1,10 @@
-package Game;
+package main.game;
 
-import Board.Board;
-import Boules.Boule;
-import Boules.Coordonnees;
-import Utils.Color;
-import Utils.IO;
+import main.board.Board;
+import main.boules.Boule;
+import main.boules.Coordonnees;
+import main.utils.Color;
+import main.utils.IO;
 
 import java.util.Random;
 
@@ -80,12 +80,12 @@ public class Game {
         try {
             int newTaille = Integer.parseInt(argument);
             if (newTaille < 5 || newTaille > 19) {
-                throw new IllegalArgumentException("board size outside engine's limits");
+                throw new IllegalArgumentException("main.board size outside engine's limits");
             }
             this.taille = newTaille;
             this.board = new Board(taille);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("board size outside engine's limits");
+            throw new IllegalArgumentException("main.board size outside engine's limits");
         }
     }
 
@@ -120,6 +120,8 @@ public class Game {
      * @throws IllegalArgumentException si la couleur est invalide.
      */
     private void generateMove(String colorArg) {
+        if(colorArg == null)
+            throw new IllegalArgumentException("Invalid command. Use : genmove <color>");
         Color color = checkColorValid(colorArg);
         Coordonnees randomMove = findRandomEmptyCell(); // Trouve une case vide au hasard.
         board.addBoule(new Boule(randomMove, color)); // Place une boule à cette position.

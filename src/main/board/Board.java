@@ -1,7 +1,7 @@
-package Board;
+package main.board;
 
-import Boules.Boule;
-import Boules.Coordonnees;
+import main.boules.Boule;
+import main.boules.Coordonnees;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class Board {
 
-    private final List<Boule> boules; // Liste des boules placées sur le plateau.
+    private final List<Boule> boules; // Liste des main.boules placées sur le plateau.
     private final char[][] grille;   // Représentation du plateau.
     private final int taille;        // Taille du plateau.
 

@@ -1,7 +1,8 @@
-package Game;
+package test.game;
 
+import main.game.Game;
 import org.junit.Test;
-import static org.mockito.Mockito.*;
+//import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameTest {

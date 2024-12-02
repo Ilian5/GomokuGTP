@@ -1,6 +1,6 @@
-package Boules;
+package main.boules;
 
-import Utils.Color;
+import main.utils.Color;
 
 public class Boule {
     private Coordonnees coordonnees;

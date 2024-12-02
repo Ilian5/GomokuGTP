@@ -1,4 +1,4 @@
-package Boules;
+package main.boules;
 
 public class Coordonnees {
     private int x;

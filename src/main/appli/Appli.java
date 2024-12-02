@@ -1,7 +1,6 @@
-package Appli;
+package main.appli;
 
-import java.util.Scanner;
-import Game.Game;
+import main.game.Game;
 
 public class Appli {
     public static void main(String[] args) {

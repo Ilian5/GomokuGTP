@@ -1,4 +1,4 @@
-package Utils;
+package main.utils;
 
 public enum Color {
 
