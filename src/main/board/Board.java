@@ -55,7 +55,6 @@ public class Board {
 
     /**
      * Vérifie si une case est occupée.
-     *
      * @param coord Coordonnées de la case à vérifier.
      * @return {@code true} si la case est occupée, {@code false} sinon.
      */
@@ -68,7 +67,6 @@ public class Board {
 
     /**
      * Vérifie si les coordonnées sont dans les limites du plateau.
-     *
      * @param coord Coordonnées à vérifier.
      * @return {@code true} si les coordonnées sont valides, {@code false} sinon.
      */
@@ -79,7 +77,6 @@ public class Board {
 
     /**
      * Retourne une représentation en chaîne de caractères du plateau.
-     *
      * @return Une chaîne représentant l'état du plateau.
      */
     public String toString() {
