@@ -11,6 +11,7 @@ import java.util.List;
  */
 public class Board {
 
+    private static final int NBR_BOULES_POUR_GAGNER = 5; // Le nombre de boule à aligner pour gagner
     private final List<Boule> boules; // Liste des main.boules placées sur le plateau.
     private final char[][] grille;   // Représentation du plateau.
     private final int taille;        // Taille du plateau.
@@ -101,6 +102,43 @@ public class Board {
         return s.toString();
     }
 
+    public boolean checkWinningCondition() {
+        for (int x = 0; x < grille.length; x++) {
+            for (int y = 0; y < grille[x].length; y++) {
+                char boule = grille[x][y];
+                if (boule != '.') {
+                    // Vérification dans les différentes directions
+                    if (checkDirection(x, y, 1, 0, boule) || // Horizontal
+                        checkDirection(x, y, 0, 1, boule) || // Vertical
+                        checkDirection(x, y, 1, 1, boule) || // Diagonale principale
+                        checkDirection(x, y, 1, -1, boule)) { // Diagonale secondaire
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean checkDirection(int startX, int startY, int dx, int dy, char boule) {
+        int count = 0;
+
+        for (int i = 0; i < NBR_BOULES_POUR_GAGNER; i++) {
+            int x = startX + i * dx;
+            int y = startY + i * dy;
+            if (x < 0 || x >= grille.length || y < 0 || y >= grille[0].length) {
+                break;
+            }
+            if (grille[x][y] == boule) {
+                count++;
+            } else {
+                break;
+            }
+        }
+        return count == NBR_BOULES_POUR_GAGNER;
+    }
+
+
     // --- Getters ---
     public char[][] getGrille() {
         return grille;
@@ -115,7 +153,7 @@ public class Board {
             throw new IllegalArgumentException("Invalid Coordonnees ");
         }
         for (Boule boule : boules) {
-            if (boule.getCoordonnees().equals(coordonnees)) {
+            if (boule.getCoordonnees().equal(coordonnees)) {
                 return boule;
             }
         }
@@ -123,6 +161,12 @@ public class Board {
     }
 
     public boolean isFull() {
-        return grille.length == taille;
+        for(char[] row : grille) {
+            for(char c : row) {
+                if (c == '.')
+                    return false;
+            }
+        }
+        return true;
     }
 }
