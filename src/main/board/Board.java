@@ -123,6 +123,13 @@ public class Board {
     }
 
     public boolean isFull() {
-        return grille.length == taille;
+        for (int i = 0; i < taille ; i++) {
+            for (int j = 0; j < taille; j++) {
+                if (grille[j][i] == '.') {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

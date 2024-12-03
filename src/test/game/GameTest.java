@@ -1,12 +1,6 @@
 package test.game;
-
-import main.boules.Boule;
-import main.boules.Coordonnees;
 import main.game.Game;
-import main.utils.Color;
 import org.junit.Test;
-import org.junit.jupiter.api.ClassOrderer;
-//import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameTest {
