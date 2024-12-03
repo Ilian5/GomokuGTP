@@ -1,6 +1,8 @@
 package main.game;
 
 import main.board.Board;
+import main.bot.Bot;
+import main.bot.BotAleatoire;
 import main.boules.Boule;
 import main.boules.Coordonnees;
 import main.utils.Color;
@@ -12,10 +14,7 @@ import java.util.Random;
 public class Game {
 
     private static final int TAILLE_DEFAULT = 19; // Taille par défaut du plateau (19x19).
-
-
     private Board board; //Plateau de jeu.
-    private final Random random; //Générateur de nombres aléatoires pour les mouvements automatiques.
     private final IO io; //Gestionnaire des entrées/sorties.
     private int taille; //Taille actuelle du plateau.
     private int nbCommande;
@@ -24,7 +23,6 @@ public class Game {
         this.taille = TAILLE_DEFAULT;
         this.board = new Board(taille);
         this.io = new IO();
-        this.random = new Random();
         this.nbCommande = 1;
     }
 
@@ -61,8 +59,8 @@ public class Game {
 
         switch (action) {
             case "boardsize" -> setBoardSize(argument);
-            case "clear_board" -> clearBoard();
             case "play" -> playMove(parts);
+            case "clear_board" -> clearBoard();
             case "genmove" -> generateMove(argument);
             case "showboard" -> showBoard();
             case "quit" -> {return false;}
@@ -123,9 +121,11 @@ public class Game {
         if(colorArg == null)
             throw new IllegalArgumentException("Invalid command. Use : genmove <color>");
         Color color = checkColorValid(colorArg);
-        Coordonnees randomMove = findRandomEmptyCell(); // Trouve une case vide au hasard.
+        Bot bot = new BotAleatoire();
+        Coordonnees randomMove = bot.genMove(colorArg, board);
         board.addBoule(new Boule(randomMove, color)); // Place une boule à cette position.
         io.sendResponse("=" + nbCommande + " " + formatCoordinates(randomMove));
+
     }
 
     /**
@@ -158,7 +158,7 @@ public class Game {
      * @throws IllegalArgumentException si la position est invalide.
      */
     private Coordonnees checkCoordinatesValid(String input) {
-        if (input.isEmpty() || input.charAt(0) < 'A' || input.charAt(0) >= 'A' + taille - 1) {
+        if (input.isEmpty() || input.charAt(0) < 'A' || input.charAt(0) >= 'A' + taille) {
             throw new IllegalArgumentException("Invalid vertex");
         }
         int x = input.charAt(0) - 'A'; // Colonne.
@@ -182,20 +182,11 @@ public class Game {
         return (char) ('A' + coord.getX()) + Integer.toString(coord.getY() + 1);
     }
 
-    /**
-     * Trouve une cellule vide aléatoire sur le plateau.
-     * @return Coordonnées d'une cellule vide.
-     */
-    private Coordonnees findRandomEmptyCell() {
-        int x, y;
-        do {
-            x = random.nextInt(taille);
-            y = random.nextInt(taille);
-        } while (board.isOccupied(new Coordonnees(x, y)));
-        return new Coordonnees(x, y);
-    }
-
     public int getBoardSize() {
         return taille;
+    }
+
+    public Board getBoard() {
+        return board;
     }
 }

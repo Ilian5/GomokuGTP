@@ -1,34 +1,85 @@
 package test.game;
 
+import main.boules.Boule;
+import main.boules.Coordonnees;
 import main.game.Game;
+import main.utils.Color;
 import org.junit.Test;
+import org.junit.jupiter.api.ClassOrderer;
 //import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameTest {
-    private final int TAILLE_GOMOKU_MAX = 19;
-    private final int TAILLE_GOMOKU_MIN = 5;
-    private static final int TAILLE_BOARD_TEST = 6;
+    private static final int TAILLE_GOMOKU_MAX = 19;
+    private static final int TAILLE_GOMOKU_MIN = 5;
+    private static final int TAILLE_GAMOKU_TEST = 8;
 
     private Game gameTest;
-//    public GameTest() {
-//        this.gameTest = new Game();
-//        gameTest.setTaille(TAILLE_BOARD_TEST);
-//    }
-//
-//    @Test
-//    public void testBoardSize() {
-//        gameTest.executeCommande("boardsize 5");
-//        assertEquals(5, gameTest.getTaille(), "La taille devrait être 5.");
-//    }
-//
-//
-//    @Test public void testBoardSizePetite(){
-//        assertThrows(AssertionError.class, () ->{
-//            gameTest.executeCommande("partiestop");
-//            gameTest.executeCommande("boardsize 1");
-//        },"La taille du plateau est trop petit 1 la taille doit etre superieur = a 5");
-//    }
+    public GameTest() {
+        this.gameTest = new Game();
+    }
+
+    @Test
+    public void testBoardSize() {
+        gameTest.executeCommand("boardsize " + TAILLE_GAMOKU_TEST);
+        assertEquals(TAILLE_GAMOKU_TEST, gameTest.getBoardSize(), "La taille devrait être à 8");
+    }
+
+    @Test
+    public void testShowBoard() {
+        gameTest.executeCommand("boardsize " + TAILLE_GAMOKU_TEST);
+        String plateau =
+                "   A  B  C  D  E  F  G  H  \n" +
+                "1  .  .  .  .  .  .  .  .  1\n" +
+                "2  .  .  .  .  .  .  .  .  2\n" +
+                "3  .  .  .  .  .  .  .  .  3\n" +
+                "4  .  .  .  .  .  .  .  .  4\n" +
+                "5  .  .  .  .  .  .  .  .  5\n" +
+                "6  .  .  .  .  .  .  .  .  6\n" +
+                "7  .  .  .  .  .  .  .  .  7\n" +
+                "8  .  .  .  .  .  .  .  .  8\n" +
+                "   A  B  C  D  E  F  G  H  ";
+        assertEquals(plateau, gameTest.getBoard().toString(), "La grille doit être vide");
+    }
+
+    @Test
+    public void testPlay() {
+        gameTest.executeCommand("boardsize " + TAILLE_GAMOKU_TEST);
+        gameTest.executeCommand("play black d5");
+        String plateauAfterPlay =
+                "   A  B  C  D  E  F  G  H  \n" +
+                "1  .  .  .  .  .  .  .  .  1\n" +
+                "2  .  .  .  .  .  .  .  .  2\n" +
+                "3  .  .  .  .  .  .  .  .  3\n" +
+                "4  .  .  .  .  .  .  .  .  4\n" +
+                "5  .  .  .  X  .  .  .  .  5\n" +
+                "6  .  .  .  .  .  .  .  .  6\n" +
+                "7  .  .  .  .  .  .  .  .  7\n" +
+                "8  .  .  .  .  .  .  .  .  8\n" +
+                "   A  B  C  D  E  F  G  H  ";
+        assertEquals(plateauAfterPlay, gameTest.getBoard().toString(), "Une boule noir (X) devrait être placée en D5");
+    }
+
+    @Test
+    public void testClearBoard() {
+        gameTest.executeCommand("boardsize " + TAILLE_GAMOKU_TEST);
+        gameTest.executeCommand("play black d5");
+        String plateauAfterClear =
+                "   A  B  C  D  E  F  G  H  \n" +
+                "1  .  .  .  .  .  .  .  .  1\n" +
+                "2  .  .  .  .  .  .  .  .  2\n" +
+                "3  .  .  .  .  .  .  .  .  3\n" +
+                "4  .  .  .  .  .  .  .  .  4\n" +
+                "5  .  .  .  .  .  .  .  .  5\n" +
+                "6  .  .  .  .  .  .  .  .  6\n" +
+                "7  .  .  .  .  .  .  .  .  7\n" +
+                "8  .  .  .  .  .  .  .  .  8\n" +
+                "   A  B  C  D  E  F  G  H  ";
+        gameTest.executeCommand("clear_board");
+        assertEquals(plateauAfterClear, gameTest.getBoard().toString(), "Le plateau devrait être totalement vide");
+    }
+
+
 //
 //
 //    @Test public void testBoardSizeGrand(){
