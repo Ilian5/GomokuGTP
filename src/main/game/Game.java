@@ -14,6 +14,7 @@ import java.util.Random;
 public class Game {
 
     private static final int TAILLE_DEFAULT = 19; // Taille par défaut du plateau (19x19).
+    private Bot bot;
     private Board board; //Plateau de jeu.
     private final IO io; //Gestionnaire des entrées/sorties.
     private int taille; //Taille actuelle du plateau.
@@ -24,6 +25,7 @@ public class Game {
         this.board = new Board(taille);
         this.io = new IO();
         this.nbCommande = 1;
+        bot = new BotAleatoire();
     }
 
     /**
@@ -39,11 +41,17 @@ public class Game {
                 running = executeCommand(command);
                 if(!command.startsWith("genmove"))
                     io.sendResponse("=" + nbCommande);
+                if(isGameOver())
+                    break;
             } catch (IllegalArgumentException e) {
                 io.sendError(e.getMessage(), nbCommande);
             }
             nbCommande++;
         }
+    }
+
+    private boolean isGameOver() {
+        return board.isFull() || board.checkWinningCondition();
     }
 
     /**
@@ -78,12 +86,12 @@ public class Game {
         try {
             int newTaille = Integer.parseInt(argument);
             if (newTaille < 5 || newTaille > 19) {
-                throw new IllegalArgumentException("main.board size outside engine's limits");
+                throw new IllegalArgumentException("size outside engine's limits");
             }
             this.taille = newTaille;
             this.board = new Board(taille);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("main.board size outside engine's limits");
+            throw new IllegalArgumentException("size outside engine's limits");
         }
     }
 
