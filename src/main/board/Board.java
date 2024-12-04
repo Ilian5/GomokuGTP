@@ -115,7 +115,7 @@ public class Board {
             throw new IllegalArgumentException("Invalid Coordonnees ");
         }
         for (Boule boule : boules) {
-            if (boule.getCoordonnees().equals(coordonnees)) {
+            if (boule.getCoordonnees().equal(coordonnees)) {
                 return boule;
             }
         }
@@ -123,11 +123,10 @@ public class Board {
     }
 
     public boolean isFull() {
-        for (int i = 0; i < taille ; i++) {
-            for (int j = 0; j < taille; j++) {
-                if (grille[j][i] == '.') {
+        for (char[] row : grille) {
+            for (char c : row) {
+                if (c == '.')
                     return false;
-                }
             }
         }
         return true;
