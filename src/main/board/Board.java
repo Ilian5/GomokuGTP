@@ -107,7 +107,6 @@ public class Board {
             for (int y = 0; y < grille[x].length; y++) {
                 char boule = grille[x][y];
                 if (boule != '.') {
-                    // Vérification dans les différentes directions
                     if (checkDirection(x, y, 1, 0, boule) || // Horizontal
                         checkDirection(x, y, 0, 1, boule) || // Vertical
                         checkDirection(x, y, 1, 1, boule) || // Diagonale principale
@@ -122,7 +121,6 @@ public class Board {
 
     private boolean checkDirection(int startX, int startY, int dx, int dy, char boule) {
         int count = 0;
-
         for (int i = 0; i < NBR_BOULES_POUR_GAGNER; i++) {
             int x = startX + i * dx;
             int y = startY + i * dy;
@@ -137,7 +135,6 @@ public class Board {
         }
         return count == NBR_BOULES_POUR_GAGNER;
     }
-
 
     // --- Getters ---
     public char[][] getGrille() {
@@ -161,8 +158,8 @@ public class Board {
     }
 
     public boolean isFull() {
-        for(char[] row : grille) {
-            for(char c : row) {
+        for (char[] row : grille) {
+            for (char c : row) {
                 if (c == '.')
                     return false;
             }

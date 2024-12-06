@@ -130,7 +130,7 @@ public class Game {
             throw new IllegalArgumentException("Invalid command. Use : genmove <color>");
         Color color = checkColorValid(colorArg);
         Bot bot = new BotAleatoire();
-        Coordonnees randomMove = bot.genMove(colorArg, board);
+        Coordonnees randomMove = bot.genMove(board);
         board.addBoule(new Boule(randomMove, color)); // Place une boule à cette position.
         io.sendResponse("=" + nbCommande + " " + formatCoordinates(randomMove));
 

@@ -6,10 +6,10 @@ Ce projet est une implémentation du jeu **Gomoku** (Cinq en ligne) en Java. Il 
 - 📏 **Grille de jeu configurable** : par défaut en 15x15.
 - 🎯 **Détection des alignements gagnants** : horizontal, vertical ou diagonal.
 - 🕹️ **Modes de jeu disponibles** :
-  - Humain vs Modèle automatisé
+  - Humain vs Modèle Aléatoire
 
-## 🤖 Modèle automatisé
-Le modèle est conçu pour simuler un adversaire jouant selon des stratégies fixes. Il **ne s'agit pas d'une intelligence artificielle** : le modèle utilise des règles prédéfinies pour choisir ses coups et ne peut pas apprendre ou s'adapter.
+## 🤖 Modèle Aléatoire
+Le modèle est conçu pour simuler un adversaire jouant aléatoirement. Il **ne s'agit pas d'une intelligence artificielle** : le modèle n'utilise aucunes règles prédéfinies pour choisir ses coups et ne peut pas apprendre ou s'adapter. Il joue simplement aléatoirement.
 
 ## 🚀 Technologies utilisées
 - **Langage** : Java
