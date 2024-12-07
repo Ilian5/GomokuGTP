@@ -3,6 +3,7 @@ package main.game;
 import main.board.Board;
 import main.bot.Bot;
 import main.bot.BotAleatoire;
+import main.bot.BotMinimax;
 import main.boules.Boule;
 import main.boules.Coordonnees;
 import main.utils.Color;
@@ -51,7 +52,7 @@ public class Game {
     }
 
     private boolean isGameOver() {
-        return board.isFull() || board.checkWinningCondition();
+        return board.isFull() || board.hasWinner();
     }
 
     /**
@@ -129,8 +130,8 @@ public class Game {
         if(colorArg == null)
             throw new IllegalArgumentException("Invalid command. Use : genmove <color>");
         Color color = checkColorValid(colorArg);
-        Bot bot = new BotAleatoire();
-        Coordonnees randomMove = bot.genMove(board);
+        Bot bot = new BotMinimax();
+        Coordonnees randomMove = bot.genMove(board, color);
         board.addBoule(new Boule(randomMove, color)); // Place une boule à cette position.
         io.sendResponse("=" + nbCommande + " " + formatCoordinates(randomMove));
 

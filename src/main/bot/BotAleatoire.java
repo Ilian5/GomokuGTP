@@ -17,7 +17,7 @@ public class BotAleatoire extends Bot {
     }
 
     @Override
-    public Coordonnees genMove(Board board) {
+    public Coordonnees genMove(Board board, Color color) {
         if(board.isFull())
             throw new ArrayIndexOutOfBoundsException("Board is Full");
         return findRandomEmptyCell(board);  // Trouve une case vide au hasard et la renvoie.
@@ -36,4 +36,3 @@ public class BotAleatoire extends Bot {
         return new Coordonnees(x, y);
     }
 }
-//

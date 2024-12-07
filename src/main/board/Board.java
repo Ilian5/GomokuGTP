@@ -2,6 +2,7 @@ package main.board;
 
 import main.boules.Boule;
 import main.boules.Coordonnees;
+import main.utils.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +55,14 @@ public class Board {
         grille[coord.getX()][coord.getY()] = boule.getColor().getColorChar(); // Marque la case sur la grille.
     }
 
+    public void removeBoule(Coordonnees coord) {
+        if(!isOccupied(coord)) {
+            throw new IllegalArgumentException("i can't remove a boule");
+        }
+        boules.removeIf(boule -> boule.getCoordonnees().equal(coord));
+        grille[coord.getX()][coord.getY()] = '.';
+    }
+
     /**
      * Vérifie si une case est occupée.
      * @param coord Coordonnées de la case à vérifier.
@@ -74,6 +83,17 @@ public class Board {
     private boolean isWithinBounds(Coordonnees coord) {
         return coord.getX() >= 0 && coord.getX() < taille &&
                 coord.getY() >= 0 && coord.getY() < taille;
+    }
+
+    public List<Coordonnees> getMovePossible() {
+        List<Coordonnees> moves = new ArrayList<>();
+        for (int i = 0; i < taille; i++) {
+            for (int j = 0; j < taille; j++) {
+             if(!isOccupied(new Coordonnees(i, j)))
+                 moves.add(new Coordonnees(i, j));
+            }
+        }
+        return moves;
     }
 
     /**
@@ -102,7 +122,7 @@ public class Board {
         return s.toString();
     }
 
-    public boolean checkWinningCondition() {
+    public boolean hasWinner() {
         for (int x = 0; x < grille.length; x++) {
             for (int y = 0; y < grille[x].length; y++) {
                 char boule = grille[x][y];
