@@ -12,7 +12,6 @@ import java.util.List;
  */
 public class Board {
 
-    private static final int NBR_BOULES_POUR_GAGNER = 5; // Le nombre de boule à aligner pour gagner
     private final List<Boule> boules; // Liste des main.boules placées sur le plateau.
     private final char[][] grille;   // Représentation du plateau.
     private final int taille;        // Taille du plateau.
@@ -122,26 +121,24 @@ public class Board {
         return s.toString();
     }
 
-    public boolean hasWinner() {
-        for (int x = 0; x < grille.length; x++) {
-            for (int y = 0; y < grille[x].length; y++) {
-                char boule = grille[x][y];
-                if (boule != '.') {
-                    if (checkDirection(x, y, 1, 0, boule) || // Horizontal
-                        checkDirection(x, y, 0, 1, boule) || // Vertical
-                        checkDirection(x, y, 1, 1, boule) || // Diagonale principale
-                        checkDirection(x, y, 1, -1, boule)) { // Diagonale secondaire
-                        return true;
-                    }
+    public boolean hasWinner(int nbAlignementWin) {
+        for(Boule b : boules) {
+            char boule = grille[b.getCoordonnees().getX()][b.getCoordonnees().getY()];
+            if (boule != '.') {
+                if (checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 1, 0, boule, nbAlignementWin) || // Horizontal
+                        checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 0, 1, boule, nbAlignementWin) || // Vertical
+                        checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 1, 1, boule, nbAlignementWin) || // Diagonale principale
+                        checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 1, -1, boule, nbAlignementWin)) { // Diagonale secondaire
+                    return true;
                 }
             }
         }
         return false;
     }
 
-    private boolean checkDirection(int startX, int startY, int dx, int dy, char boule) {
+    private boolean checkDirection(int startX, int startY, int dx, int dy, char boule, int nbAlignementWin) {
         int count = 0;
-        for (int i = 0; i < NBR_BOULES_POUR_GAGNER; i++) {
+        for (int i = 0; i < nbAlignementWin; i++) {
             int x = startX + i * dx;
             int y = startY + i * dy;
             if (x < 0 || x >= grille.length || y < 0 || y >= grille[0].length) {
@@ -153,7 +150,7 @@ public class Board {
                 break;
             }
         }
-        return count == NBR_BOULES_POUR_GAGNER;
+        return count == nbAlignementWin;
     }
 
     // --- Getters ---
@@ -185,5 +182,22 @@ public class Board {
             }
         }
         return true;
+    }
+
+    public Color getColorWinner(int nbAlignementWin) {
+        if(!hasWinner(nbAlignementWin))
+            throw new IllegalArgumentException("No winner found");
+        for(Boule b : boules) {
+            char boule = grille[b.getCoordonnees().getX()][b.getCoordonnees().getY()];
+            if (boule != '.') {
+                if (checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 1, 0, boule, nbAlignementWin) || // Horizontal
+                    checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 0, 1, boule, nbAlignementWin) || // Vertical
+                    checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 1, 1, boule, nbAlignementWin) || // Diagonale principale
+                    checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 1, -1, boule, nbAlignementWin)) { // Diagonale secondaire
+                    return b.getColor();
+                }
+            }
+        }
+        return null;
     }
 }

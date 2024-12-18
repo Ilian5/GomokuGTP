@@ -10,11 +10,9 @@ public class Boule {
         this.coordonnees = coordonnees;
         this.color = color;
     }
-
     public Color getColor() {
         return color;
     }
-
     public Coordonnees getCoordonnees() {
         return coordonnees;
     }

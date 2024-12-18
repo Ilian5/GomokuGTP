@@ -7,6 +7,7 @@ import main.bot.BotMinimax;
 import main.boules.Boule;
 import main.boules.Coordonnees;
 import main.utils.Color;
+import main.utils.Constante;
 import main.utils.IO;
 
 import java.util.Random;
@@ -14,19 +15,18 @@ import java.util.Random;
 
 public class Game {
 
-    private static final int TAILLE_DEFAULT = 19; // Taille par défaut du plateau (19x19).
     private Bot bot;
     private Board board; //Plateau de jeu.
     private final IO io; //Gestionnaire des entrées/sorties.
     private int taille; //Taille actuelle du plateau.
-    private int nbCommande;
+    private int nbAlignementWin;
 
     public Game() {
-        this.taille = TAILLE_DEFAULT;
+        this.taille = Constante.TAILLE_DEFAULT_BOARD;
+        nbAlignementWin = Constante.BOARD_ALLIGNEMENT_DEFAULT;
         this.board = new Board(taille);
         this.io = new IO();
-        this.nbCommande = 1;
-        bot = new BotAleatoire();
+        bot = new BotMinimax(4);
     }
 
     /**
@@ -36,24 +36,19 @@ public class Game {
     public void startSession() {
         boolean running = true;
         while (running) {
-            String command = io.getCommande(nbCommande).trim();
+            String command = io.getCommande().trim();
             if (command.isEmpty()) continue;
             try {
                 running = executeCommand(command);
-                if(!command.startsWith("genmove"))
-                    io.sendResponse("=" + nbCommande);
                 if(isGameOver())
                     break;
             } catch (IllegalArgumentException e) {
-                io.sendError(e.getMessage(), nbCommande);
+                io.sendError(e.getMessage());
             }
-            nbCommande++;
         }
+        gameOver();
     }
 
-    private boolean isGameOver() {
-        return board.isFull() || board.hasWinner();
-    }
 
     /**
      * Exécute une commande GTP reçue en entrée.
@@ -63,18 +58,31 @@ public class Game {
      */
     public boolean executeCommand(String command) {
         String[] parts = command.split(" ");
-        String action = parts[0].toLowerCase(); // Première partie de la commande (action).
-        String argument = parts.length > 1 ? parts[1] : null;
-
+        String action = "";
+        String argument = "";
+        String reponse = "";
+        int nbCommand = 0;
+        try {
+            nbCommand = Integer.parseInt(parts[0]);
+            action = parts[1].toLowerCase(); // Première partie de la commande (action).
+            argument = parts.length > 2 ? parts[2] : null;
+        } catch (NumberFormatException e) {
+            action = parts[0].toLowerCase(); // Première partie de la commande (action).
+            argument = parts.length > 1 ? parts[1] : null;
+        }
         switch (action) {
-            case "boardsize" -> setBoardSize(argument);
-            case "play" -> playMove(parts);
-            case "clear_board" -> clearBoard();
-            case "genmove" -> generateMove(argument);
-            case "showboard" -> showBoard();
+            case "boardsize" -> reponse = setBoardSize(argument);
+            case "play" -> reponse = playMove(parts);
+            case "clear_board" -> reponse = clearBoard();
+            case "genmove" -> reponse = generateMove(argument);
+            case "showboard" -> reponse = showBoard();
             case "quit" -> {return false;}
             default -> throw new IllegalArgumentException("invalid command");
         }
+        if(nbCommand != 0)
+            io.sendResponse("=" + nbCommand + " " + reponse);
+        else
+            io.sendResponse("=" + reponse);
         return true;
     }
 
@@ -83,24 +91,27 @@ public class Game {
      * @param argument Taille du plateau sous forme de chaîne (exemple : "19").
      * @throws IllegalArgumentException si la taille est invalide (en dehors de [5, 19]).
      */
-    private void setBoardSize(String argument) {
+    private String setBoardSize(String argument) {
         try {
             int newTaille = Integer.parseInt(argument);
-            if (newTaille < 5 || newTaille > 19) {
+            if (newTaille < Constante.MIN_BOARD || newTaille > Constante.MAX_BOARD) {
                 throw new IllegalArgumentException("size outside engine's limits");
             }
             this.taille = newTaille;
             this.board = new Board(taille);
+            nbAlignementWin = (taille <= Constante.BOARD_ALLIGNEMENT_POUR_TROIS) ? Constante.BOARD_ALLIGNEMENT : Constante.BOARD_ALLIGNEMENT_DEFAULT;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("size outside engine's limits");
         }
+        return "";
     }
 
     /**
      * Réinitialise le plateau à un état vide.
      */
-    private void clearBoard() {
+    private String clearBoard() {
         this.board = new Board(taille);
+        return "";
     }
 
     /**
@@ -108,7 +119,7 @@ public class Game {
      * @param parts Commande décomposée en parties (exemple : ["play", "B", "D5"]).
      * @throws IllegalArgumentException si la commande est mal formée ou si la position est occupée.
      */
-    private void playMove(String[] parts) {
+    private String playMove(String[] parts) {
         if (parts.length < 3) {
             throw new IllegalArgumentException("Invalid command. Use : play <color> <vertex>");
         }
@@ -119,6 +130,7 @@ public class Game {
             throw new IllegalArgumentException("Illegal move");
         }
         board.addBoule(new Boule(coord, color));
+        return "";
     }
 
     /**
@@ -126,26 +138,32 @@ public class Game {
      * @param colorArg Couleur pour laquelle générer un mouvement (exemple : "B").
      * @throws IllegalArgumentException si la couleur est invalide.
      */
-    private void generateMove(String colorArg) {
+    private String generateMove(String colorArg) {
         if(colorArg == null)
             throw new IllegalArgumentException("Invalid command. Use : genmove <color>");
         Color color = checkColorValid(colorArg);
-        Bot bot = new BotMinimax();
         Coordonnees randomMove = bot.genMove(board, color);
         board.addBoule(new Boule(randomMove, color)); // Place une boule à cette position.
-        io.sendResponse("=" + nbCommande + " " + formatCoordinates(randomMove));
+        return formatCoordinates(randomMove);
 
     }
 
     /**
      * Affiche le plateau dans le format GTP.
      */
-    private void showBoard() {
+    private String showBoard() {
         io.sendResponse(board.toString());
+        return "";
     }
 
     // --- Méthodes utilitaires ---
+    private boolean isGameOver() {
+        return board.isFull() || board.hasWinner(nbAlignementWin);
+    }
 
+    private void gameOver() {
+        io.sendResponse("Le joueur " + (board.getColorWinner(nbAlignementWin) == Color.Black ? "Noir" : "Blanc") + " a gagné.");
+    }
     /**
      * Analyse la couleur à partir d'une chaîne.
      * @param colorArg Chaîne représentant la couleur (exemple : "B" ou "W").

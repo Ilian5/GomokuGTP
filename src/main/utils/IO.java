@@ -25,8 +25,7 @@ public class IO {
      *
      * @return La commande saisie par l'utilisateur sous forme de chaîne.
      */
-    public String getCommande(int nbCommande) {
-        System.out.print(nbCommande + " ");  // Affiche un prompt pour l'utilisateur
+    public String getCommande() {
         return scanner.nextLine().trim();
     }
 
@@ -43,7 +42,7 @@ public class IO {
      * Envoie une erreur au moteur si la commande est invalide ou a échoué.
      * @param errorMessage Le message d'erreur à envoyer.
      */
-    public void sendError(String errorMessage, int nbCommande) {
-        System.out.println("?" + nbCommande + " " + errorMessage + "\n");
+    public void sendError(String errorMessage) {
+        System.out.println("?" + " " + errorMessage + "\n");
     }
 }
