@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GameTest {
 
     private static final int TAILLE_GAMOKU_TEST = 8;
-    private Game gameTest;
+    private final Game gameTest;
 
     public GameTest() {
         gameTest = new Game();

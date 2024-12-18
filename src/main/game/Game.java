@@ -18,13 +18,11 @@ public class Game {
     private Board board; //Plateau de jeu.
     private final Bot bot;
     private final IO io; //Gestionnaire des entrées/sorties.
-    private int taille; //Taille actuelle du plateau.
     private int nbAlignementWin;
 
     public Game() {
-        this.taille = Constante.TAILLE_DEFAULT_BOARD;
         nbAlignementWin = Constante.BOARD_ALLIGNEMENT_DEFAULT;
-        this.board = new Board(taille);
+        this.board = new Board(Constante.TAILLE_DEFAULT_BOARD);
         this.io = new IO();
         bot = new BotMinimax(4);
     }
@@ -97,9 +95,8 @@ public class Game {
             if (newTaille < Constante.MIN_BOARD || newTaille > Constante.MAX_BOARD) {
                 throw new IllegalArgumentException("size outside engine's limits");
             }
-            this.taille = newTaille;
-            this.board = new Board(taille);
-            nbAlignementWin = (taille <= Constante.BOARD_ALLIGNEMENT_POUR_TROIS) ? Constante.BOARD_ALLIGNEMENT : Constante.BOARD_ALLIGNEMENT_DEFAULT;
+            this.board = new Board(newTaille);
+            nbAlignementWin = (newTaille <= Constante.BOARD_ALLIGNEMENT_POUR_TROIS) ? Constante.BOARD_ALLIGNEMENT : Constante.BOARD_ALLIGNEMENT_DEFAULT;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("size outside engine's limits");
         }
@@ -110,7 +107,7 @@ public class Game {
      * Réinitialise le plateau à un état vide.
      */
     private String clearBoard() {
-        this.board = new Board(taille);
+        this.board = new Board(this.getBoardSize());
         return "";
     }
 
@@ -185,13 +182,13 @@ public class Game {
      * @throws IllegalArgumentException si la position est invalide.
      */
     private Coordonnees checkCoordinatesValid(String input) {
-        if (input.isEmpty() || input.charAt(0) < 'A' || input.charAt(0) >= 'A' + taille) {
+        if (input.isEmpty() || input.charAt(0) < 'A' || input.charAt(0) >= 'A' + this.getBoardSize()) {
             throw new IllegalArgumentException("Invalid vertex");
         }
         int x = input.charAt(0) - 'A'; // Colonne.
         try {
             int y = Integer.parseInt(input.substring(1)) - 1; // Ligne.
-            if (y < 0 || y >= taille) {
+            if (y < 0 || y >= this.getBoardSize()) {
                 throw new IllegalArgumentException("Invalid vertex");
             }
             return new Coordonnees(x, y);
@@ -210,7 +207,7 @@ public class Game {
     }
 
     public int getBoardSize() {
-        return taille;
+        return this.board.getGrille().getTaille();
     }
 
     public Board getBoard() {
