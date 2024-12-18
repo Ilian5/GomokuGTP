@@ -152,13 +152,13 @@ public class Game {
      * Affiche le plateau dans le format GTP.
      */
     private String showBoard() {
-        io.sendResponse(board.toString());
+        io.sendResponse(board.getGrille().toString());
         return "";
     }
 
     // --- Méthodes utilitaires ---
     private boolean isGameOver() {
-        return board.isFull() || board.hasWinner(nbAlignementWin);
+        return board.getGrille().isFull() || board.hasWinner(nbAlignementWin);
     }
 
     private void gameOver() {

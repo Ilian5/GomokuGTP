@@ -71,14 +71,6 @@ public class Board {
                 coord.getY() >= 0 && coord.getY() < grille.getTaille();
     }
 
-    /**
-     * Retourne une représentation en chaîne de caractères du plateau.
-     * @return Une chaîne représentant l'état du plateau.
-     */
-    public String toString() {
-        return grille.toString();
-    }
-
     public boolean hasWinner(int nbAlignementWin) {
         for(Boule b : boules) {
             char boule = grille.getEmplacement(b.getCoordonnees());
@@ -99,10 +91,10 @@ public class Board {
         for (int i = 0; i < nbAlignementWin; i++) {
             int x = startX + i * dx;
             int y = startY + i * dy;
-            if (x < 0 || x >= grille.length || y < 0 || y >= grille[0].length) {
+            if (x < 0 || x >= grille.getTaille() || y < 0 || y >= grille.getTaille()) {
                 break;
             }
-            if (grille[x][y] == boule) {
+            if (grille.getEmplacement(new Coordonnees(x,y)) == boule) {
                 count++;
             } else {
                 break;
@@ -112,14 +104,6 @@ public class Board {
     }
 
     // --- Getters ---
-    public char[][] getGrille() {
-        return grille;
-    }
-
-    public int getTaille() {
-        return taille;
-    }
-
     public Boule getBouleAt(Coordonnees coordonnees) {
         if (!isWithinBounds(coordonnees)) {
             throw new IllegalArgumentException("Invalid Coordonnees ");
@@ -132,21 +116,13 @@ public class Board {
         return null;
     }
 
-    public boolean isFull() {
-        for (char[] row : grille) {
-            for (char c : row) {
-                if (c == '.')
-                    return false;
-            }
-        }
-        return true;
-    }
+
 
     public Color getColorWinner(int nbAlignementWin) {
         if(!hasWinner(nbAlignementWin))
             throw new IllegalArgumentException("No winner found");
         for(Boule b : boules) {
-            char boule = grille[b.getCoordonnees().getX()][b.getCoordonnees().getY()];
+            char boule = grille.getEmplacement(b.getCoordonnees());
             if (boule != '.') {
                 if (checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 1, 0, boule, nbAlignementWin) || // Horizontal
                     checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 0, 1, boule, nbAlignementWin) || // Vertical
@@ -168,5 +144,9 @@ public class Board {
             }
         }
         return moves;
+    }
+
+    public Grille getGrille() {
+        return grille;
     }
 }

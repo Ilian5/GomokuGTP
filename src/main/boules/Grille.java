@@ -64,4 +64,14 @@ public class Grille {
     public char getEmplacement(Coordonnees coord) {
         return grille[coord.getX()][coord.getY()];
     }
+
+    public boolean isFull() {
+        for (char[] row : grille) {
+            for (char c : row) {
+                if (c == '.')
+                    return false;
+            }
+        }
+        return true;
+    }
 }

@@ -25,7 +25,7 @@ public class BoardTest {
         boardTest.addBoule(boule);
 
         assertTrue(boardTest.isOccupied(coordonnees), "La case devrait être occupée après l'ajout.");
-        assertEquals('X', boardTest.getGrille()[2][3], "La grille devrait contenir le caractère 'R' à ces coordonnées.");
+        assertEquals('X', boardTest.getGrille().getEmplacement(new Coordonnees(2, 3)), "La grille devrait contenir le caractère 'R' à ces coordonnées.");
         assertEquals(boule, boardTest.getBouleAt(coordonnees), "La boule ajoutée devrait être retrouvée à ces coordonnées.");
     }
 
@@ -81,7 +81,7 @@ public class BoardTest {
                 "8  .  .  .  .  .  .  .  .  8\n" +
                 "   A  B  C  D  E  F  G  H  ";
 
-        assertEquals(expectedInitial, boardTest.toString(), "La représentation initiale du plateau devrait être correcte.");
+        assertEquals(expectedInitial, boardTest.getGrille().toString(), "La représentation initiale du plateau devrait être correcte.");
 
         boardTest.addBoule(new Boule(new Coordonnees(0, 0), Color.Black));
         boardTest.addBoule(new Boule(new Coordonnees(7, 7), Color.White));
@@ -98,7 +98,7 @@ public class BoardTest {
                 "8  .  .  .  .  .  .  .  O  8\n" +
                 "   A  B  C  D  E  F  G  H  ";
 
-        assertEquals(expectedAfterAdd, boardTest.toString(), "La représentation du plateau après ajout devrait être correcte.");
+        assertEquals(expectedAfterAdd, boardTest.getGrille().toString(), "La représentation du plateau après ajout devrait être correcte.");
        }
 
 }

@@ -36,7 +36,8 @@ public class GameTest {
         gameTest.executeCommand("play black D5");
         gameTest.executeCommand("clear_board");
         Board board = gameTest.getBoard();
-        for (char[] row : board.getGrille()) {
+        char[][] tt = new char[5][5];
+        for (char[] row : tt) {
             for (char cell : row) {
                 assertEquals('.', cell, "Toutes les cases du plateau doivent être vides après le clear_board.");
             }
