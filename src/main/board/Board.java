@@ -2,6 +2,7 @@ package main.board;
 
 import main.boules.Boule;
 import main.boules.Coordonnees;
+import main.boules.Grille;
 import main.utils.Color;
 
 import java.util.ArrayList;
@@ -13,8 +14,7 @@ import java.util.List;
 public class Board {
 
     private final List<Boule> boules; // Liste des main.boules placées sur le plateau.
-    private final char[][] grille;   // Représentation du plateau.
-    private final int taille;        // Taille du plateau.
+    private final Grille grille;
 
     /**
      * Constructeur de la classe {@code Board}.
@@ -22,21 +22,8 @@ public class Board {
      * @param taille Taille du plateau.
      */
     public Board(int taille) {
-        this.taille = taille;
         this.boules = new ArrayList<>();
-        this.grille = new char[taille][taille];
-        initialiserGrille();
-    }
-
-    /**
-     * Initialise la grille avec des cases vides représentées par '.'.
-     */
-    private void initialiserGrille() {
-        for (int i = 0; i < taille; i++) {
-            for (int j = 0; j < taille; j++) {
-                grille[i][j] = '.';
-            }
-        }
+        grille = new Grille(taille);
     }
 
     /**
@@ -51,7 +38,7 @@ public class Board {
             throw new IllegalArgumentException("invalid vertex");
         }
         boules.add(boule);
-        grille[coord.getX()][coord.getY()] = boule.getColor().getColorChar(); // Marque la case sur la grille.
+        grille.addBoule(boule); // Marque la case sur la grille.
     }
 
     public void removeBoule(Coordonnees coord) {
@@ -59,7 +46,7 @@ public class Board {
             throw new IllegalArgumentException("i can't remove a boule");
         }
         boules.removeIf(boule -> boule.getCoordonnees().equal(coord));
-        grille[coord.getX()][coord.getY()] = '.';
+        grille.remove(coord);
     }
 
     /**
@@ -71,7 +58,7 @@ public class Board {
         if (!isWithinBounds(coord)) {
             throw new IllegalArgumentException("invalid vertex, invalid move");
         }
-        return grille[coord.getX()][coord.getY()] != '.';
+        return grille.isOccupied(coord);
     }
 
     /**
@@ -80,19 +67,8 @@ public class Board {
      * @return {@code true} si les coordonnées sont valides, {@code false} sinon.
      */
     private boolean isWithinBounds(Coordonnees coord) {
-        return coord.getX() >= 0 && coord.getX() < taille &&
-                coord.getY() >= 0 && coord.getY() < taille;
-    }
-
-    public List<Coordonnees> getMovePossible() {
-        List<Coordonnees> moves = new ArrayList<>();
-        for (int i = 0; i < taille; i++) {
-            for (int j = 0; j < taille; j++) {
-             if(!isOccupied(new Coordonnees(i, j)))
-                 moves.add(new Coordonnees(i, j));
-            }
-        }
-        return moves;
+        return coord.getX() >= 0 && coord.getX() < grille.getTaille() &&
+                coord.getY() >= 0 && coord.getY() < grille.getTaille();
     }
 
     /**
@@ -100,30 +76,12 @@ public class Board {
      * @return Une chaîne représentant l'état du plateau.
      */
     public String toString() {
-        StringBuilder s = new StringBuilder("   ");
-        for(int i = 0; i < taille; i++) {
-            char letter = (char) ('A' + i);
-            s.append(letter).append("  ");
-        }
-        s.append("\n");
-        for (int i = 0; i < taille; i++) {
-            s.append(i + 1).append(i < 9 ? " " : "");
-            for (int j = 0; j < taille; j++) {
-                s.append(" ").append(grille[j][i]).append(" ");
-            }
-            s.append(i < 9 ? " " : "").append(i + 1).append("\n");
-        }
-        s.append("   ");
-        for(int i = 0; i < taille; i++) {
-            char letter = (char) ('A' + i);
-            s.append(letter).append("  ");
-        }
-        return s.toString();
+        return grille.toString();
     }
 
     public boolean hasWinner(int nbAlignementWin) {
         for(Boule b : boules) {
-            char boule = grille[b.getCoordonnees().getX()][b.getCoordonnees().getY()];
+            char boule = grille.getEmplacement(b.getCoordonnees());
             if (boule != '.') {
                 if (checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 1, 0, boule, nbAlignementWin) || // Horizontal
                         checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 0, 1, boule, nbAlignementWin) || // Vertical
@@ -199,5 +157,16 @@ public class Board {
             }
         }
         return null;
+    }
+
+    public List<Coordonnees> getMovePossible() {
+        List<Coordonnees> moves = new ArrayList<>();
+        for (int i = 0; i < grille.getTaille(); i++) {
+            for (int j = 0; j < grille.getTaille(); j++) {
+                if(!isOccupied(new Coordonnees(i, j)))
+                    moves.add(new Coordonnees(i, j));
+            }
+        }
+        return moves;
     }
 }

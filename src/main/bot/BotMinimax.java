@@ -8,7 +8,7 @@ import main.utils.Color;
 import java.util.List;
 
 public class BotMinimax extends Bot {
-    private int max_depth; // Profondeur maximale pour l'exploration
+    private final int max_depth; // Profondeur maximale pour l'exploration
 
     public BotMinimax(int max_depth) {
         this.max_depth = max_depth;
@@ -48,7 +48,7 @@ public class BotMinimax extends Bot {
      * @return La valeur évaluée du plateau.
      */
     private int minimax(Board board, int depth, int alpha, int beta, boolean isMaximizingPlayer, Color maximizingPlayerColor) {
-        if (depth == 0 || board.hasWinner(5) || board.isFull()) {
+        if (depth == 0 || board.isFull()) {
             return evaluateBoard(board, maximizingPlayerColor);
         }
 

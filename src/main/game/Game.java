@@ -15,8 +15,8 @@ import java.util.Random;
 
 public class Game {
 
-    private Bot bot;
     private Board board; //Plateau de jeu.
+    private final Bot bot;
     private final IO io; //Gestionnaire des entrées/sorties.
     private int taille; //Taille actuelle du plateau.
     private int nbAlignementWin;
