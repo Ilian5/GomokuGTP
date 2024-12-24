@@ -5,6 +5,7 @@ import main.boules.Boule;
 import main.boules.Coordonnees;
 import main.utils.Color;
 
+import java.util.List;
 import java.util.Random;
 
 public class BotAleatoire extends Bot {
@@ -13,26 +14,15 @@ public class BotAleatoire extends Bot {
 
     public BotAleatoire() {
         super();
-        random = new Random();
+        this.random = new Random();
     }
 
     @Override
     public Coordonnees genMove(Board board, Color color) {
-        if(board.getGrille().isFull())
-            throw new ArrayIndexOutOfBoundsException("Board is Full");
-        return findRandomEmptyCell(board);  // Trouve une case vide au hasard et la renvoie.
-    }
-
-    /**
-     * Trouve une cellule vide aléatoire sur le plateau.
-     * @return Coordonnées d'une cellule vide.
-     */
-    private Coordonnees findRandomEmptyCell(Board board) {
-        int x, y;
-        do {
-            x = random.nextInt(board.getGrille().getTaille());
-            y = random.nextInt(board.getGrille().getTaille());
-        } while (board.isOccupied(new Coordonnees(x, y)));
-        return new Coordonnees(x, y);
+        List<Coordonnees> moves = board.getMovePossible();
+        if (moves.isEmpty()) {
+            throw new IllegalStateException("No possible moves");
+        }
+        return moves.get(random.nextInt(moves.size()));
     }
 }
