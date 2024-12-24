@@ -2,7 +2,7 @@ package main.board;
 
 import main.boules.Boule;
 import main.boules.Coordonnees;
-import main.boules.Grille;
+import main.grille.Grille;
 import main.utils.Color;
 
 import java.util.ArrayList;
@@ -76,9 +76,9 @@ public class Board {
             char boule = grille.getEmplacement(b.getCoordonnees());
             if (boule != '.') {
                 if (checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 1, 0, boule, nbAlignementWin) || // Horizontal
-                        checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 0, 1, boule, nbAlignementWin) || // Vertical
-                        checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 1, 1, boule, nbAlignementWin) || // Diagonale principale
-                        checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 1, -1, boule, nbAlignementWin)) { // Diagonale secondaire
+                    checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 0, 1, boule, nbAlignementWin) || // Vertical
+                    checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 1, 1, boule, nbAlignementWin) || // Diagonale principale
+                    checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 1, -1, boule, nbAlignementWin)) { // Diagonale secondaire
                     return true;
                 }
             }

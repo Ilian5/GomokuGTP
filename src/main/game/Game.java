@@ -6,6 +6,7 @@ import main.bot.BotAleatoire;
 import main.bot.BotMinimax;
 import main.boules.Boule;
 import main.boules.Coordonnees;
+import main.grille.GrilleAffichage;
 import main.utils.Color;
 import main.utils.Constante;
 import main.utils.IO;
@@ -15,16 +16,16 @@ import java.util.Random;
 
 public class Game {
 
+    private Bot bot;
     private Board board; //Plateau de jeu.
-    private final Bot bot;
     private final IO io; //Gestionnaire des entrées/sorties.
-    private int nbAlignementWin;
+    private int nbAllignement;
 
     public Game() {
-        nbAlignementWin = Constante.BOARD_ALLIGNEMENT_DEFAULT;
         this.board = new Board(Constante.TAILLE_DEFAULT_BOARD);
         this.io = new IO();
-        bot = new BotMinimax(4);
+        this.bot = new BotAleatoire();
+        nbAllignement = Constante.BOARD_ALLIGNEMENT_DEFAULT;
     }
 
     /**
@@ -44,9 +45,11 @@ public class Game {
                 io.sendError(e.getMessage());
             }
         }
-        gameOver();
     }
 
+    private boolean isGameOver() {
+        return board.getGrille().isFull() || board.getGrille().hasWinner(nbAllignement);
+    }
 
     /**
      * Exécute une commande GTP reçue en entrée.
@@ -58,16 +61,17 @@ public class Game {
         String[] parts = command.split(" ");
         String action = "";
         String argument = "";
-        String reponse = "";
-        int nbCommand = 0;
+        int nbCommande = 0;
         try {
-            nbCommand = Integer.parseInt(parts[0]);
-            action = parts[1].toLowerCase(); // Première partie de la commande (action).
+            nbCommande = Integer.parseInt(parts[0]);
+            action = parts[1].toLowerCase();
             argument = parts.length > 2 ? parts[2] : null;
         } catch (NumberFormatException e) {
-            action = parts[0].toLowerCase(); // Première partie de la commande (action).
+            action = parts[0].toLowerCase();
             argument = parts.length > 1 ? parts[1] : null;
         }
+
+        String reponse = "";
         switch (action) {
             case "boardsize" -> reponse = setBoardSize(argument);
             case "play" -> reponse = playMove(parts);
@@ -77,10 +81,10 @@ public class Game {
             case "quit" -> {return false;}
             default -> throw new IllegalArgumentException("invalid command");
         }
-        if(nbCommand != 0)
-            io.sendResponse("=" + nbCommand + " " + reponse);
+        if(nbCommande != 0)
+            System.out.println("=" + nbCommande + " " + reponse);
         else
-            io.sendResponse("=" + reponse);
+            System.out.println("= " + reponse);
         return true;
     }
 
@@ -92,11 +96,10 @@ public class Game {
     private String setBoardSize(String argument) {
         try {
             int newTaille = Integer.parseInt(argument);
-            if (newTaille < Constante.MIN_BOARD || newTaille > Constante.MAX_BOARD) {
+            if (newTaille < 5 || newTaille > 19) {
                 throw new IllegalArgumentException("size outside engine's limits");
             }
             this.board = new Board(newTaille);
-            nbAlignementWin = (newTaille <= Constante.BOARD_ALLIGNEMENT_POUR_TROIS) ? Constante.BOARD_ALLIGNEMENT : Constante.BOARD_ALLIGNEMENT_DEFAULT;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("size outside engine's limits");
         }
@@ -107,7 +110,8 @@ public class Game {
      * Réinitialise le plateau à un état vide.
      */
     private String clearBoard() {
-        this.board = new Board(this.getBoardSize());
+        int taille = this.getBoardSize();
+        this.board = new Board(taille);
         return "";
     }
 
@@ -149,18 +153,12 @@ public class Game {
      * Affiche le plateau dans le format GTP.
      */
     private String showBoard() {
-        io.sendResponse(board.getGrille().toString());
+        io.sendResponse(GrilleAffichage.afficherGrille(board.getGrille()));
         return "";
     }
 
     // --- Méthodes utilitaires ---
-    private boolean isGameOver() {
-        return board.getGrille().isFull() || board.hasWinner(nbAlignementWin);
-    }
 
-    private void gameOver() {
-        io.sendResponse("Le joueur " + (board.getColorWinner(nbAlignementWin) == Color.Black ? "Noir" : "Blanc") + " a gagné.");
-    }
     /**
      * Analyse la couleur à partir d'une chaîne.
      * @param colorArg Chaîne représentant la couleur (exemple : "B" ou "W").
@@ -182,13 +180,13 @@ public class Game {
      * @throws IllegalArgumentException si la position est invalide.
      */
     private Coordonnees checkCoordinatesValid(String input) {
-        if (input.isEmpty() || input.charAt(0) < 'A' || input.charAt(0) >= 'A' + this.getBoardSize()) {
+        if (input.isEmpty() || input.charAt(0) < 'A' || input.charAt(0) >= 'A' + getBoardSize()) {
             throw new IllegalArgumentException("Invalid vertex");
         }
         int x = input.charAt(0) - 'A'; // Colonne.
         try {
             int y = Integer.parseInt(input.substring(1)) - 1; // Ligne.
-            if (y < 0 || y >= this.getBoardSize()) {
+            if (y < 0 || y >= getBoardSize()) {
                 throw new IllegalArgumentException("Invalid vertex");
             }
             return new Coordonnees(x, y);
@@ -207,7 +205,7 @@ public class Game {
     }
 
     public int getBoardSize() {
-        return this.board.getGrille().getTaille();
+        return board.getGrille().getTaille();
     }
 
     public Board getBoard() {
