@@ -71,38 +71,6 @@ public class Board {
                 coord.getY() >= 0 && coord.getY() < grille.getTaille();
     }
 
-    public boolean hasWinner(int nbAlignementWin) {
-        for(Boule b : boules) {
-            char boule = grille.getEmplacement(b.getCoordonnees());
-            if (boule != '.') {
-                if (checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 1, 0, boule, nbAlignementWin) || // Horizontal
-                    checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 0, 1, boule, nbAlignementWin) || // Vertical
-                    checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 1, 1, boule, nbAlignementWin) || // Diagonale principale
-                    checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 1, -1, boule, nbAlignementWin)) { // Diagonale secondaire
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean checkDirection(int startX, int startY, int dx, int dy, char boule, int nbAlignementWin) {
-        int count = 0;
-        for (int i = 0; i < nbAlignementWin; i++) {
-            int x = startX + i * dx;
-            int y = startY + i * dy;
-            if (x < 0 || x >= grille.getTaille() || y < 0 || y >= grille.getTaille()) {
-                break;
-            }
-            if (grille.getEmplacement(new Coordonnees(x,y)) == boule) {
-                count++;
-            } else {
-                break;
-            }
-        }
-        return count == nbAlignementWin;
-    }
-
     // --- Getters ---
     public Boule getBouleAt(Coordonnees coordonnees) {
         if (!isWithinBounds(coordonnees)) {
@@ -111,25 +79,6 @@ public class Board {
         for (Boule boule : boules) {
             if (boule.getCoordonnees().equal(coordonnees)) {
                 return boule;
-            }
-        }
-        return null;
-    }
-
-
-
-    public Color getColorWinner(int nbAlignementWin) {
-        if(!hasWinner(nbAlignementWin))
-            throw new IllegalArgumentException("No winner found");
-        for(Boule b : boules) {
-            char boule = grille.getEmplacement(b.getCoordonnees());
-            if (boule != '.') {
-                if (checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 1, 0, boule, nbAlignementWin) || // Horizontal
-                    checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 0, 1, boule, nbAlignementWin) || // Vertical
-                    checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 1, 1, boule, nbAlignementWin) || // Diagonale principale
-                    checkDirection(b.getCoordonnees().getX(), b.getCoordonnees().getY(), 1, -1, boule, nbAlignementWin)) { // Diagonale secondaire
-                    return b.getColor();
-                }
             }
         }
         return null;
