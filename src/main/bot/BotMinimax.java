@@ -8,18 +8,49 @@ import main.utils.Color;
 import java.util.List;
 
 public class BotMinimax extends Bot {
-    private final int max_depth; // Profondeur maximale pour l'exploration
 
-    public BotMinimax(int max_depth) {
-        super();
-        this.max_depth = max_depth;
+    private final int depth; // Profondeur de l'algorithme
+    private Color botColor; // Couleur du bot
+    private Color opponentColor; // Couleur de l'adversaire
+
+    // Constructeur
+    public BotMinimax(int depth) {
+        this.depth = depth;
     }
 
     @Override
     public Coordonnees genMove(Board board, Color color) {
-        return null;
+        this.botColor = color;
+        this.opponentColor = (botColor == Color.Black) ? Color.White : Color.Black;
+        return findBestMove(board);
     }
+
+    private Coordonnees findBestMove(Board board) {
+        int bestValue = Integer.MIN_VALUE;
+        Coordonnees bestMove = null;
+
+        List<Coordonnees> moves = board.getMovePossible();
+        for (Coordonnees move : moves) {
+            board.addBoule(new Boule(move, botColor)); // Le bot joue ici
+            int moveValue = minimax(board, depth, false); // Évalue la position après le coup
+            board.removeBoule(move); // Annule le coup
+
+            if (moveValue > bestValue) {
+                bestValue = moveValue;
+                bestMove = move;
+            }
+        }
+
+        return bestMove;
+    }
+
 }
+
+
+
+
+
+
 //    /**
 //     * Trouve le meilleur coup à jouer pour le bot.
 //     * @param board Le plateau de jeu actuel.

@@ -19,13 +19,13 @@ public class Game {
     private Bot bot;
     private Board board; //Plateau de jeu.
     private final IO io; //Gestionnaire des entrées/sorties.
-    private int nbAllignement;
+    private int nbAlignement;
 
     public Game() {
         this.board = new Board(Constante.TAILLE_DEFAULT_BOARD);
         this.io = new IO();
-        this.bot = new BotAleatoire();
-        nbAllignement = Constante.BOARD_ALLIGNEMENT_DEFAULT;
+        this.bot = new BotMinimax(450541);
+        nbAlignement = Constante.BOARD_ALIGNEMENT_DEFAULT;
     }
 
     /**
@@ -45,10 +45,17 @@ public class Game {
                 io.sendError(e.getMessage());
             }
         }
+        gameEnd();
     }
 
     private boolean isGameOver() {
-        return board.getGrille().isFull() || board.getGrille().hasWinner(nbAllignement);
+        return board.getGrille().isFull() || board.getGrille().hasWinner(nbAlignement);
+    }
+
+    private void gameEnd() {
+        if(isGameOver())
+            io.sendResponse("Le noir ou le blanc à gagné !");
+
     }
 
     /**
@@ -96,10 +103,11 @@ public class Game {
     private String setBoardSize(String argument) {
         try {
             int newTaille = Integer.parseInt(argument);
-            if (newTaille < 5 || newTaille > 19) {
+            if (newTaille < Constante.MIN_BOARD || newTaille > Constante.MAX_BOARD) {
                 throw new IllegalArgumentException("size outside engine's limits");
             }
             this.board = new Board(newTaille);
+            nbAlignement = (newTaille < Constante.BOARD_ALIGNEMENT_POUR_TROIS ? Constante.BOARD_ALIGNEMENT : Constante.BOARD_ALIGNEMENT_DEFAULT); //Si la taille est inférieur à 8 on mets un alignement de 3 sinon c'est 5
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("size outside engine's limits");
         }

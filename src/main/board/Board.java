@@ -95,6 +95,10 @@ public class Board {
         return moves;
     }
 
+    public boolean gameOver() {
+        return getMovePossible().isEmpty();
+    }
+
     public Grille getGrille() {
         return grille;
     }

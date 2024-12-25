@@ -13,7 +13,7 @@ public class GrilleAffichage {
         for (int i = 0; i < grille.getTaille(); i++) {
             s.append(i + 1).append(i < 9 ? " " : "");
             for (int j = 0; j < grille.getTaille(); j++) {
-                s.append(" ").append(grille.getEmplacement(new Coordonnees(i, j))).append(" ");
+                s.append(" ").append(grille.getEmplacement(new Coordonnees(j, i))).append(" ");
             }
             s.append(i < 9 ? " " : "").append(i + 1).append("\n");
         }
