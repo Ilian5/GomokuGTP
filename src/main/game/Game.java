@@ -24,7 +24,7 @@ public class Game {
     public Game() {
         this.board = new Board(Constante.TAILLE_DEFAULT_BOARD);
         this.io = new IO();
-        this.bot = new BotMinimax(450541);
+        this.bot = new BotMinimax(5);
         nbAlignement = Constante.BOARD_ALIGNEMENT_DEFAULT;
     }
 
