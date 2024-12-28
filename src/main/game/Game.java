@@ -24,8 +24,8 @@ public class Game {
     public Game() {
         this.board = new Board(Constante.TAILLE_DEFAULT_BOARD);
         this.io = new IO();
-        this.bot = new BotMinimax(5);
-        nbAlignement = Constante.BOARD_ALIGNEMENT_DEFAULT;
+        this.bot = new BotMinimax(3);
+        nbAlignement = Constante.ALIGNMENT_TO_WIN_LARGE;
     }
 
     /**
@@ -54,7 +54,7 @@ public class Game {
 
     private void gameEnd() {
         if(isGameOver())
-            io.sendResponse("Le noir ou le blanc à gagné !");
+            io.sendResponse("Le joueur " + board.getGrille().getColorWin(nbAlignement) + " a gagné la partie !");
 
     }
 
@@ -107,7 +107,7 @@ public class Game {
                 throw new IllegalArgumentException("size outside engine's limits");
             }
             this.board = new Board(newTaille);
-            nbAlignement = (newTaille < Constante.BOARD_ALIGNEMENT_POUR_TROIS ? Constante.BOARD_ALIGNEMENT : Constante.BOARD_ALIGNEMENT_DEFAULT); //Si la taille est inférieur à 8 on mets un alignement de 3 sinon c'est 5
+            nbAlignement = (newTaille < Constante.MIN_SIZE_FOR_FIVE_ALIGNMENT ? Constante.ALIGNMENT_TO_WIN_SMALL : Constante.ALIGNMENT_TO_WIN_LARGE); //Si la taille est inférieur à 8 on mets un alignement de 3 sinon c'est 5
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("size outside engine's limits");
         }

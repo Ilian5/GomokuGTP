@@ -2,6 +2,7 @@ package main.grille;
 
 import main.boules.Boule;
 import main.boules.Coordonnees;
+import main.utils.Color;
 
 public class Grille {
 
@@ -85,6 +86,23 @@ public class Grille {
             }
         }
         return count == nbAlignementWin;
+    }
+
+    public Color getColorWin(int nbAlignementWin) {
+        for (int x = 0; x < taille; x++) {
+            for (int y = 0; y < taille; y++) {
+                char current = this.getEmplacement(new Coordonnees(x, y));
+                if (current != '.') {
+                    if (checkDirection(x, y, 1, 0, current, nbAlignementWin) || // Horizontal
+                        checkDirection(x, y, 0, 1, current, nbAlignementWin) || // Vertical
+                        checkDirection(x, y, 1, 1, current, nbAlignementWin) || // Diagonale principale
+                        checkDirection(x, y, 1, -1, current, nbAlignementWin)) { // Diagonale secondaire
+                        return (current == 'X' ? Color.Black : Color.White);
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 

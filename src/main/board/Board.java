@@ -66,7 +66,7 @@ public class Board {
      * @param coord Coordonnées à vérifier.
      * @return {@code true} si les coordonnées sont valides, {@code false} sinon.
      */
-    private boolean isWithinBounds(Coordonnees coord) {
+    public boolean isWithinBounds(Coordonnees coord) {
         return coord.getX() >= 0 && coord.getX() < grille.getTaille() &&
                 coord.getY() >= 0 && coord.getY() < grille.getTaille();
     }
@@ -102,4 +102,6 @@ public class Board {
     public Grille getGrille() {
         return grille;
     }
+
+
 }
