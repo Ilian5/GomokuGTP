@@ -13,6 +13,7 @@ Ce projet implémente le **jeu Gomoku** avec une interface en ligne de commande 
   - `clear_board` : Réinitialise le plateau de jeu.
   - `genmove <couleur>` : L'IA génère un coup pour la couleur spécifiée.
   - `showboard` : Affiche l'état actuel du plateau.
+  - `set_player <couleur> <type> [profondeur]` : Change un joueur en un certain type (ex. : `set_player black minimax 5`)
   - `quit` : Met fin à la session de jeu.
 
 ---
