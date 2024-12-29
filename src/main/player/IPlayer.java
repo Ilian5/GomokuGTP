@@ -1,9 +1,7 @@
 package main.player;
 
-import main.board.Board;
-import main.boules.Coordonnees;
-import main.utils.Color;
+import main.grille.Grille;
 
 public interface IPlayer {
-    Coordonnees playMove(Board board);
+    int[] playMove(Grille grille);
 }

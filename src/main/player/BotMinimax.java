@@ -1,15 +1,7 @@
 package main.player;
 
-import main.board.Board;
-import main.boules.Boule;
-import main.boules.Coordonnees;
-import main.game.Game;
 import main.grille.Grille;
-import main.player.IPlayer;
-import main.player.Player;
 import main.utils.Color;
-
-import java.util.List;
 
 public class BotMinimax extends Player {
 
@@ -26,11 +18,11 @@ public class BotMinimax extends Player {
     }
 
     @Override
-    public Coordonnees playMove(Board b) {
-        return findBestMove(b.getGrille());
+    public int[] playMove(Grille grille) {
+        return findBestMove(grille);
     }
 
-    public Coordonnees findBestMove(Grille grille) {
+    public int[] findBestMove(Grille grille) {
         int[] bestMove = new int[]{-1, -1};
         int bestValue = Integer.MIN_VALUE;
 
@@ -50,8 +42,7 @@ public class BotMinimax extends Player {
             }
         }
 
-        Coordonnees c =new Coordonnees(bestMove[0], bestMove[1]);
-        return c;
+        return bestMove;
     }
 
     public int miniMax(Grille grille, int depth, int alpha, int beta, boolean isMax) {

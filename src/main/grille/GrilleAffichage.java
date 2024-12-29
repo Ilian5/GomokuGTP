@@ -1,7 +1,5 @@
 package main.grille;
 
-import main.boules.Coordonnees;
-
 public class GrilleAffichage {
     public static String afficherGrille(Grille grille) {
         StringBuilder s = new StringBuilder("   ");
@@ -18,7 +16,7 @@ public class GrilleAffichage {
             char letter = (char) ('A' + i);
             s.append(letter).append(" "); // Lettre sur le côté gauche
             for (int j = 0; j < taille; j++) {
-                s.append(" ").append(grille.getEmplacement(new Coordonnees(i, j))).append(" ");
+                s.append(" ").append(grille.getBouleAt(i, j)).append(" ");
             }
             s.append(letter).append("\n"); // Lettre sur le côté droit
         }

@@ -1,12 +1,10 @@
 package main.game;
 
-import main.board.Board;
+import main.grille.Grille;
 import main.player.BotAleatoire;
 import main.player.BotMinimax;
 import main.player.Human;
 import main.player.Player;
-import main.boules.Boule;
-import main.boules.Coordonnees;
 import main.grille.GrilleAffichage;
 import main.utils.Color;
 import main.utils.Constante;
@@ -15,14 +13,14 @@ import main.utils.IO;
 
 public class Game {
 
-    private Board board; //Plateau de jeu.
+    private Grille grille; //Plateau de jeu.
     private final IO io; //Gestionnaire des entrées/sorties.
     private int nbAlignement;
     private Player p1, p2;
     private int currentPlayerIndex;
 
     public Game() {
-        this.board = new Board(Constante.TAILLE_DEFAULT_BOARD);
+        this.grille = new Grille(Constante.TAILLE_DEFAULT_BOARD);
         nbAlignement = Constante.ALIGNMENT_TO_WIN_LARGE;
         this.io = new IO();
         this.p1 = new Human(Color.Black);
@@ -42,7 +40,7 @@ public class Game {
             try {
                 running = executeCommand(command);
                 if (currentPlayer instanceof BotMinimax && command.startsWith("genmove")) {
-                    currentPlayer.playMove(board);
+                    currentPlayer.playMove(grille);
                 }
                 if (isGameOver()) {
                     break;
@@ -56,12 +54,12 @@ public class Game {
     }
 
     private boolean isGameOver() {
-        return board.getGrille().isFull() || (board.getGrille().getWinner(nbAlignement)!=Color.Blank.toChar());
+        return grille.isFull() || (grille.getWinner(nbAlignement)!=Color.Blank.toChar());
     }
 
     private void gameEnd() {
         if(isGameOver()) //Je vérifie que la partie est fini
-            io.sendResponse("Le joueur " + board.getGrille().getWinner(nbAlignement) + " a gagné la partie !");
+            io.sendResponse("Le joueur " + grille.getWinner(nbAlignement) + " a gagné la partie !");
     }
 
     /**
@@ -127,7 +125,7 @@ public class Game {
             if (newTaille < Constante.MIN_BOARD || newTaille > Constante.MAX_BOARD) {
                 throw new IllegalArgumentException("size outside engine's limits");
             }
-            this.board = new Board(newTaille);
+            this.grille = new Grille(newTaille);
             nbAlignement = (newTaille < Constante.MIN_SIZE_FOR_FIVE_ALIGNMENT ? Constante.ALIGNMENT_TO_WIN_SMALL : Constante.ALIGNMENT_TO_WIN_LARGE); //Si la taille est inférieur à 8 on mets un alignement de 3 sinon c'est 5
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("size outside engine's limits");
@@ -140,7 +138,7 @@ public class Game {
      */
     private String clearBoard() {
         int taille = this.getBoardSize();
-        this.board = new Board(taille);
+        this.grille = new Grille(taille);
         return "";
     }
 
@@ -154,21 +152,16 @@ public class Game {
             throw new IllegalArgumentException("Invalid command. Use : play <color> <vertex>");
         }
         Color color = checkColorValid(parts[1]); // Analyse la couleur (B ou W).
-        Coordonnees coord = checkCoordinatesValid(parts[2].toUpperCase()); // Analyse les coordonnées.
+        int[] moves = checkCoordinatesValid(parts[2].toUpperCase()); // Analyse les coordonnées.
 
-        if (board.isOccupied(coord)) {
+        if (grille.isOccupied(moves[0], moves[1])) {
             throw new IllegalArgumentException("Illegal move");
         }
-        board.addBoule(new Boule(coord, color));
+        grille.addBouleAt(moves[0], moves[1], color);
         currentPlayerIndex = (currentPlayerIndex + 1) % 2;
         return "";
     }
 
-    /**
-     * Génère un mouvement aléatoire pour une couleur donnée.
-     * @param colorArg Couleur pour laquelle générer un mouvement (exemple : "B").
-     * @throws IllegalArgumentException si la couleur est invalide.
-     */
     private String generateMove(String colorArg) {
         if (colorArg == null) {
             throw new IllegalArgumentException("Invalid command. Use : genmove <color>");
@@ -179,29 +172,20 @@ public class Game {
         if (!(player instanceof BotAleatoire) && !(player instanceof BotMinimax)) {
             throw new IllegalArgumentException("The specified player is not a bot.");
         }
-        Coordonnees move = player.playMove(board);
-        board.addBoule(new Boule(move, color));
+        int[] move = player.playMove(grille);
+        grille.addBouleAt(move[0], move[1], color);
         currentPlayerIndex = (currentPlayerIndex + 1) % 2;
         return formatCoordinates(move);
     }
 
 
-    /**
-     * Affiche le plateau dans le format GTP.
-     */
     private String showBoard() {
-        io.sendResponse(GrilleAffichage.afficherGrille(board.getGrille()));
+        io.sendResponse(GrilleAffichage.afficherGrille(grille));
         return "";
     }
 
     // --- Méthodes utilitaires ---
 
-    /**
-     * Analyse la couleur à partir d'une chaîne.
-     * @param colorArg Chaîne représentant la couleur (exemple : "B" ou "W").
-     * @return {@code Color.Black} ou {@code Color.White}.
-     * @throws IllegalArgumentException si la couleur est invalide.
-     */
     private Color checkColorValid(String colorArg) {
         return switch (colorArg.toUpperCase()) {
             case "BLACK" -> Color.Black;
@@ -210,28 +194,21 @@ public class Game {
         };
     }
 
-    /**
-     * Analyse une position sous forme de chaîne en coordonnées.
-     * @param input Position en notation GTP (exemple : "D5").
-     * @return Objet {@code Coordonnees} correspondant à la position.
-     * @throws IllegalArgumentException si la position est invalide.
-     */
-    private Coordonnees checkCoordinatesValid(String input) {
+    private int[] checkCoordinatesValid(String input) {
         if (input.isEmpty() || input.charAt(0) < 'A' || input.charAt(0) >= 'A' + getBoardSize()) {
             throw new IllegalArgumentException("Invalid vertex");
         }
-        int x = input.charAt(0) - 'A'; // Colonne.
+        int x = input.charAt(0) - 'A';
         try {
-            int y = Integer.parseInt(input.substring(1)) - 1; // Ligne.
+            int y = Integer.parseInt(input.substring(1)) - 1;
             if (y < 0 || y >= getBoardSize()) {
                 throw new IllegalArgumentException("Invalid vertex");
             }
-            return new Coordonnees(x, y);
+            return new int[]{x, y};
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid vertex");
         }
     }
-
 
     private Player checkPlayerTypeValid(String playerType, Color color, String profondeur) {
         switch (playerType.toLowerCase()) {
@@ -254,20 +231,15 @@ public class Game {
         }
     }
 
-    /**
-     * Formate des coordonnées en notation GTP.
-     * @param coord Objet {@code Coordonnees}.
-     * @return Position au format GTP (exemple : "D5").
-     */
-    private String formatCoordinates(Coordonnees coord) {
-        return (char) ('A' + coord.getX()) + Integer.toString(coord.getY() + 1);
+    private String formatCoordinates(int[] move) {
+        return (char) ('A' + move[0]) + Integer.toString(move[1] + 1);
     }
 
     public int getBoardSize() {
-        return board.getGrille().getTaille();
+        return grille.getTaille();
     }
 
-    public Board getBoard() {
-        return board;
+    public Grille getGrille() {
+        return grille;
     }
 }

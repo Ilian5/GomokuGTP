@@ -1,8 +1,7 @@
 package test.game;
 
-import main.board.Board;
-import main.boules.Coordonnees;
 import main.game.Game;
+import main.grille.Grille;
 import main.utils.Color;
 import org.junit.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,21 +24,22 @@ public class GameTest {
     @Test
     public void testSetBoardSizeInvalidNumber() {
         Exception exception = assertThrows(IllegalArgumentException.class, () ->
-                gameTest.executeCommand("boardsize 3")
+                gameTest.executeCommand("boardsize 2")
         );
         assertEquals("size outside engine's limits", exception.getMessage());
     }
 
     @Test
-    public void testClearBoard() {
+    public void testClearGrille() {
         gameTest.executeCommand("boardsize " + TAILLE_GAMOKU_TEST);
         gameTest.executeCommand("play black D5");
         gameTest.executeCommand("clear_board");
-        Board board = gameTest.getBoard();
-        char[][] tt = new char[5][5];
-        for (char[] row : tt) {
-            for (char cell : row) {
-                assertEquals('.', cell, "Toutes les cases du plateau doivent être vides après le clear_board.");
+        Grille grille = gameTest.getGrille();
+        char[][] grilleTest = new char[TAILLE_GAMOKU_TEST][TAILLE_GAMOKU_TEST];
+        for (int x = 0; x < TAILLE_GAMOKU_TEST; x++) {
+            for (int y = 0; y < TAILLE_GAMOKU_TEST; y++) {
+                char actual = grille.getBouleAt(x, y);
+                assertEquals(Color.Blank.toChar(), actual, "Toutes les cases du plateau doivent être vides après le clear_board."); // Adapte '.' au caractère utilisé pour une case vide
             }
         }
     }
@@ -48,9 +48,9 @@ public class GameTest {
     public void testPlayMoveValid() {
         gameTest.executeCommand("boardsize " + TAILLE_GAMOKU_TEST);
         gameTest.executeCommand("play black D5");
-        Board board = gameTest.getBoard();
-        assertNotNull(board.getBouleAt(new Coordonnees(3, 4)), "Une boule doit être ajoutée à la position D5.");
-        assertEquals(Color.Black, board.getBouleAt(new Coordonnees(3, 4)).getColor(), "La boule ajoutée doit être noire.");
+        Grille grille = gameTest.getGrille();
+        assertNotNull(grille.getBouleAt(3, 4), "Une boule doit être ajoutée à la position D5.");
+        assertEquals(Color.Black.toChar(), grille.getBouleAt(3, 4), "La boule ajoutée doit être noire.");
     }
 
     @Test

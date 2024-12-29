@@ -1,7 +1,6 @@
 package main.player;
 
-import main.board.Board;
-import main.boules.Coordonnees;
+import main.grille.Grille;
 import main.utils.Color;
 
 public class Human extends Player {
@@ -11,7 +10,7 @@ public class Human extends Player {
         super(color);
     }
     @Override
-    public Coordonnees playMove(Board board) {
+    public int[] playMove(Grille grille) {
         return null;
     }
 }

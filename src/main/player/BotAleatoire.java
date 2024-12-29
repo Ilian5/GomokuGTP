@@ -1,7 +1,6 @@
 package main.player;
 
-import main.board.Board;
-import main.boules.Coordonnees;
+import main.grille.Grille;
 import main.utils.Color;
 
 import java.util.List;
@@ -17,8 +16,8 @@ public class BotAleatoire extends Player {
     }
 
     @Override
-    public Coordonnees playMove(Board board) {
-        List<Coordonnees> moves = board.getMovePossible();
+    public int[] playMove(Grille grille) {
+        List<int[]> moves = grille.getMovePossible();
         if (moves.isEmpty()) {
             throw new IllegalStateException("No possible moves");
         }
