@@ -2,7 +2,7 @@ package main.utils;
 
 public class Constante {
     //Taille par défaut du plateau de jeu (19x19)
-    public static final int TAILLE_DEFAULT_BOARD = 19;
+    public static final int TAILLE_DEFAULT_BOARD = 3;
 
     //Taille minimale autorisée pour un plateau de jeu (3x3).
     public static final int MIN_BOARD = 3;

@@ -53,9 +53,8 @@ public class Game {
     }
 
     private void gameEnd() {
-        if(isGameOver())
+        if(isGameOver()) //Je vérifie que la partie est fini
             io.sendResponse("Le joueur " + board.getGrille().getColorWin(nbAlignement) + " a gagné la partie !");
-
     }
 
     /**
