@@ -1,9 +1,10 @@
 package main.game;
 
 import main.board.Board;
-import main.bot.Bot;
-import main.bot.BotAleatoire;
-import main.bot.BotMinimax;
+import main.player.BotAleatoire;
+import main.player.BotMinimax;
+import main.player.Humain;
+import main.player.Player;
 import main.boules.Boule;
 import main.boules.Coordonnees;
 import main.grille.GrilleAffichage;
@@ -11,21 +12,21 @@ import main.utils.Color;
 import main.utils.Constante;
 import main.utils.IO;
 
-import java.util.Random;
-
 
 public class Game {
 
-    private Bot bot;
     private Board board; //Plateau de jeu.
     private final IO io; //Gestionnaire des entrées/sorties.
     private int nbAlignement;
+    private Player p1, p2;
+    private int currentPlayerIndex;
 
     public Game() {
         this.board = new Board(Constante.TAILLE_DEFAULT_BOARD);
-        this.io = new IO();
-        this.bot = new BotMinimax(3);
         nbAlignement = Constante.ALIGNMENT_TO_WIN_LARGE;
+        this.io = new IO();
+        this.p1 = new BotMinimax(3, Color.Black, nbAlignement);
+        this.p2 = new BotMinimax(5, Color.White, nbAlignement);
     }
 
     /**
@@ -35,12 +36,18 @@ public class Game {
     public void startSession() {
         boolean running = true;
         while (running) {
+            Player currentPlayer = (currentPlayerIndex == 0) ? p1 : p2; // Déterminer le joueur actuel
             String command = io.getCommande().trim();
             if (command.isEmpty()) continue;
             try {
                 running = executeCommand(command);
-                if(isGameOver())
+                if (currentPlayer instanceof BotMinimax && command.startsWith("genmove")) {
+                    currentPlayer.playMove(board);
+                }
+                if (isGameOver()) {
                     break;
+                }
+
             } catch (IllegalArgumentException e) {
                 io.sendError(e.getMessage());
             }
@@ -84,6 +91,7 @@ public class Game {
             case "clear_board" -> reponse = clearBoard();
             case "genmove" -> reponse = generateMove(argument);
             case "showboard" -> reponse = showBoard();
+            case "set_player" -> reponse = setPlayer(parts);
             case "quit" -> {return false;}
             default -> throw new IllegalArgumentException("invalid command");
         }
@@ -93,6 +101,20 @@ public class Game {
             System.out.println("= " + reponse);
         return true;
     }
+
+    public String setPlayer(String[] parts) {
+        if (parts.length < 3 || parts.length > 4) {
+            throw new IllegalArgumentException("Commande invalide. Utilisez : set_player <couleur> <type> [profondeur]");
+        }
+        Color color = checkColorValid(parts[1]);
+        Player newPlayer = checkPlayerTypeValid(parts[2], color, parts.length == 4 ? parts[3] : null);
+        if (color == Color.Black)
+            p1 = newPlayer;
+        else
+            p2 = newPlayer;
+        return "Le joueur " + parts[1] + " a été défini comme : " + parts[2] + (parts.length == 4 ? " avec une profondeur de " + parts[3] : "");
+    }
+
 
     /**
      * Définit la taille du plateau de jeu.
@@ -138,6 +160,7 @@ public class Game {
             throw new IllegalArgumentException("Illegal move");
         }
         board.addBoule(new Boule(coord, color));
+        currentPlayerIndex = (currentPlayerIndex + 1) % 2;
         return "";
     }
 
@@ -147,14 +170,21 @@ public class Game {
      * @throws IllegalArgumentException si la couleur est invalide.
      */
     private String generateMove(String colorArg) {
-        if(colorArg == null)
+        if (colorArg == null) {
             throw new IllegalArgumentException("Invalid command. Use : genmove <color>");
+        }
         Color color = checkColorValid(colorArg);
-        Coordonnees randomMove = bot.genMove(board, color);
-        board.addBoule(new Boule(randomMove, color)); // Place une boule à cette position.
-        return formatCoordinates(randomMove);
+        Player player = (color == Color.Black) ? p1 : p2;
 
+        if (!(player instanceof BotAleatoire) && !(player instanceof BotMinimax)) {
+            throw new IllegalArgumentException("The specified player is not a bot.");
+        }
+        Coordonnees move = player.playMove(board);
+        board.addBoule(new Boule(move, color));
+        currentPlayerIndex = (currentPlayerIndex + 1) % 2;
+        return formatCoordinates(move);
     }
+
 
     /**
      * Affiche le plateau dans le format GTP.
@@ -199,6 +229,28 @@ public class Game {
             return new Coordonnees(x, y);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid vertex");
+        }
+    }
+
+
+    private Player checkPlayerTypeValid(String playerType, Color color, String profondeur) {
+        switch (playerType.toLowerCase()) {
+            case "humain":
+                return new Humain(color);
+            case "minimax":
+                if (profondeur == null) {
+                    throw new IllegalArgumentException("Invalid depth");
+                }
+                try {
+                    int depth = Integer.parseInt(profondeur);
+                    return new BotMinimax(depth, color, nbAlignement);
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("Invaid depth");
+                }
+            case "aleatoire":
+                return new BotAleatoire(color);
+            default:
+                throw new IllegalArgumentException("Invalid type");
         }
     }
 

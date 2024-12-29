@@ -1,24 +1,23 @@
-package main.bot;
+package main.player;
 
 import main.board.Board;
-import main.boules.Boule;
 import main.boules.Coordonnees;
 import main.utils.Color;
 
 import java.util.List;
 import java.util.Random;
 
-public class BotAleatoire extends Bot {
+public class BotAleatoire extends Player {
 
     private final Random random; //Générateur de nombres aléatoires pour les mouvements automatiques.
 
-    public BotAleatoire() {
-        super();
+    public BotAleatoire(Color color) {
+        super(color);
         this.random = new Random();
     }
 
     @Override
-    public Coordonnees genMove(Board board, Color color) {
+    public Coordonnees playMove(Board board) {
         List<Coordonnees> moves = board.getMovePossible();
         if (moves.isEmpty()) {
             throw new IllegalStateException("No possible moves");
