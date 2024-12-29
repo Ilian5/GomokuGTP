@@ -47,7 +47,7 @@ public class BotMinimax extends Player {
 
     public int miniMax(Grille grille, int depth, int alpha, int beta, boolean isMax) {
 
-        int boardVal = evaluateBoard(grille, depth);
+        int boardVal = evaluateBoard(grille);
 
         // Terminal node (win/lose/draw) or max depth reached.
         if (Math.abs(boardVal) > 0 || depth == 0
@@ -95,7 +95,7 @@ public class BotMinimax extends Player {
     }
 
 
-    private int evaluateBoard(Grille grille, int depth) {
+    private int evaluateBoard(Grille grille) {
 
         char winner = grille.getWinner(nbALignementWin);
 
@@ -103,7 +103,6 @@ public class BotMinimax extends Player {
             return 10;
         else if (winner == opponentColor.toChar())
             return -10;
-
         else
             return 0;
 
