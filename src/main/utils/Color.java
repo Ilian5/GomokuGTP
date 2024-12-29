@@ -3,7 +3,8 @@ package main.utils;
 public enum Color {
 
     Black('X'),
-    White('O');
+    White('O'),
+    Blank('.');
 
     private char color;
 

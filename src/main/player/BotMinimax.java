@@ -3,83 +3,123 @@ package main.player;
 import main.board.Board;
 import main.boules.Boule;
 import main.boules.Coordonnees;
+import main.game.Game;
+import main.grille.Grille;
+import main.player.IPlayer;
+import main.player.Player;
 import main.utils.Color;
-import main.utils.Constante;
+
+import java.util.List;
 
 public class BotMinimax extends Player {
 
-    private final int depth; // Profondeur de l'algorithme
-    private static final int MAX_SCORE = 1000; // Score élevé pour une victoire
-    private int nbAlignementWin;
+    private final int MAX_DEPTH; // Profondeur de l'algorithme
+    private Color opponentColor; // Couleur de l'adversaire
+    private int nbALignementWin;
 
     // Constructeur
-    public BotMinimax(int depth, Color color, int nbAlignementWin) {
-        super(color);
-        this.depth = depth;
-        this.nbAlignementWin = nbAlignementWin;
+    public BotMinimax(int depth, int nbALignementWin, Color botColor) {
+        super(botColor);
+        this.nbALignementWin = nbALignementWin;
+        this.MAX_DEPTH = depth;
+        this.opponentColor = (botColor == Color.Black) ? Color.White : Color.Black;
     }
 
-    public Coordonnees playMove(Board board) {
-        return getBestMove(board, super.getColor(), this.depth);
+    @Override
+    public Coordonnees playMove(Board b) {
+        return findBestMove(b.getGrille());
     }
 
+    public Coordonnees findBestMove(Grille grille) {
+        int[] bestMove = new int[]{-1, -1};
+        int bestValue = Integer.MIN_VALUE;
 
-
-    public Coordonnees getBestMove(Board board, Color botColor, int depth) {
-        int bestScore = Integer.MIN_VALUE;
-        Coordonnees bestMove = null;
-
-        for (Coordonnees move : board.getMovePossible()) {
-            board.addBoule(new Boule(move, botColor));
-            int score = minimax(board, switchColor(botColor), depth - 1, false);
-            board.removeBoule(move);
-            if (score > bestScore) {
-                bestScore = score;
-                bestMove = move;
+        for (int row = 0; row < grille.getTaille(); row++) {
+            for (int col = 0; col < grille.getTaille(); col++) {
+                if (!grille.isOccupied(row,col)) {
+                    grille.addBouleAt(row, col, super.getColor());
+                    int moveValue = miniMax(grille, MAX_DEPTH, Integer.MIN_VALUE,
+                            Integer.MAX_VALUE, false);
+                    grille.addBouleAt(row, col, Color.Blank);
+                    if (moveValue > bestValue) {
+                        bestMove[0] = row;
+                        bestMove[1] = col;
+                        bestValue = moveValue;
+                    }
+                }
             }
         }
-        return bestMove;
+
+        Coordonnees c =new Coordonnees(bestMove[0], bestMove[1]);
+        return c;
     }
 
-    private int minimax(Board board, Color turn, int depth, boolean isMaximizing) {
-        if (depth == 0 || board.getGrille().hasWinner(nbAlignementWin)) {
-            return (turn == super.getColor() ? depth - MAX_SCORE : MAX_SCORE - depth);
-        } else if (board.getGrille().isFull()) {
+    public int miniMax(Grille grille, int depth, int alpha, int beta, boolean isMax) {
+
+        int boardVal = evaluateBoard(grille, depth);
+
+        // Terminal node (win/lose/draw) or max depth reached.
+        if (Math.abs(boardVal) > 0 || depth == 0
+                || grille.isFull()) {
+            return boardVal;
+        }
+
+        // Maximising player, find the maximum attainable value.
+        if (isMax) {
+            int highestVal = Integer.MIN_VALUE;
+            for (int row = 0; row < grille.getTaille(); row++) {
+                for (int col = 0; col < grille.getTaille(); col++) {
+                    if (!grille.isOccupied(row,col)) {
+                        grille.addBouleAt(row, col, super.getColor());
+                        highestVal = Math.max(highestVal, miniMax(grille,
+                                depth - 1, alpha, beta, false));
+                        grille.addBouleAt(row, col, Color.Blank);
+                        alpha = Math.max(alpha, highestVal);
+                        if (alpha >= beta) {
+                            return highestVal;
+                        }
+                    }
+                }
+            }
+            return highestVal;
+            // Minimising player, find the minimum attainable value;
+        } else {
+            int lowestVal = Integer.MAX_VALUE;
+            for (int row = 0; row < grille.getTaille(); row++) {
+                for (int col = 0; col < grille.getTaille(); col++) {
+                    if (!grille.isOccupied(row,col)) {
+                        grille.addBouleAt(row, col, opponentColor);
+                        lowestVal = Math.min(lowestVal, miniMax(grille,
+                                depth - 1, alpha, beta, true));
+                        grille.addBouleAt(row, col, Color.Blank);
+                        beta = Math.min(beta, lowestVal);
+                        if (beta <= alpha) {
+                            return lowestVal;
+                        }
+                    }
+                }
+            }
+            return lowestVal;
+        }
+    }
+
+
+    private int evaluateBoard(Grille grille, int depth) {
+
+        char winner = grille.getWinner(nbALignementWin);
+
+        if(winner == super.getColor().toChar())
+            return 10;
+        else if (winner == opponentColor.toChar())
+            return -10;
+
+        else
             return 0;
-        }
-        // Maximisation (bot)
-        if (isMaximizing) {
-            int maxEval = Integer.MIN_VALUE;
 
-            for (Coordonnees move : board.getMovePossible()) {
-                board.addBoule(new Boule(move, turn));
-                int eval = minimax(board, switchColor(turn), depth - 1, false);
-                maxEval = Math.max(maxEval, eval);
-                board.removeBoule(move);
-            }
-
-            return maxEval;
-        }
-        // Minimisation (adversaire)
-        else {
-            int minEval = Integer.MAX_VALUE;
-
-            for (Coordonnees move : board.getMovePossible()) {
-                board.addBoule(new Boule(move, turn));
-                int eval = minimax(board, switchColor(turn), depth - 1, true);
-                minEval = Math.min(minEval, eval);
-                board.removeBoule(move);
-            }
-
-            return minEval;
-        }
     }
-
-    private static Color switchColor(Color color) {
-        return (color == Color.Black) ? Color.White : Color.Black;
-    }
-
-
 
 
 }
+
+
+

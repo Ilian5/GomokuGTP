@@ -56,12 +56,12 @@ public class Game {
     }
 
     private boolean isGameOver() {
-        return board.getGrille().isFull() || board.getGrille().hasWinner(nbAlignement);
+        return board.getGrille().isFull() || (board.getGrille().getWinner(nbAlignement)!=Color.Blank.toChar());
     }
 
     private void gameEnd() {
         if(isGameOver()) //Je vérifie que la partie est fini
-            io.sendResponse("Le joueur " + board.getGrille().getColorWin(nbAlignement) + " a gagné la partie !");
+            io.sendResponse("Le joueur " + board.getGrille().getWinner(nbAlignement) + " a gagné la partie !");
     }
 
     /**
@@ -243,7 +243,7 @@ public class Game {
                 }
                 try {
                     int depth = Integer.parseInt(profondeur);
-                    return new BotMinimax(depth, color, nbAlignement);
+                    return new BotMinimax(depth, nbAlignement, color);
                 } catch (NumberFormatException e) {
                     throw new IllegalArgumentException("Invaid depth");
                 }
