@@ -21,7 +21,7 @@ public class Game {
 
     public Game() {
         this.grille = new Grille(Constante.TAILLE_DEFAULT_BOARD);
-        nbAlignement = Constante.ALIGNMENT_TO_WIN_LARGE;
+        nbAlignement = Constante.getAlignmentToWin(Constante.TAILLE_DEFAULT_BOARD);
         this.io = new IO();
         this.p1 = new Human(Color.Black);
         this.p2 = new Human(Color.White);
@@ -126,7 +126,7 @@ public class Game {
                 throw new IllegalArgumentException("size outside engine's limits");
             }
             this.grille = new Grille(newTaille);
-            nbAlignement = (newTaille < Constante.MIN_SIZE_FOR_FIVE_ALIGNMENT ? Constante.ALIGNMENT_TO_WIN_SMALL : Constante.ALIGNMENT_TO_WIN_LARGE); //Si la taille est inférieur à 8 on mets un alignement de 3 sinon c'est 5
+            nbAlignement = Constante.getAlignmentToWin(newTaille); //Si la taille est inférieur à 8 on mets un alignement de 3 sinon c'est 5
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("size outside engine's limits");
         }
