@@ -3,7 +3,7 @@ package main.game;
 import main.board.Board;
 import main.player.BotAleatoire;
 import main.player.BotMinimax;
-import main.player.Humain;
+import main.player.Human;
 import main.player.Player;
 import main.boules.Boule;
 import main.boules.Coordonnees;
@@ -25,8 +25,8 @@ public class Game {
         this.board = new Board(Constante.TAILLE_DEFAULT_BOARD);
         nbAlignement = Constante.ALIGNMENT_TO_WIN_LARGE;
         this.io = new IO();
-        this.p1 = new BotMinimax(3, Color.Black, nbAlignement);
-        this.p2 = new BotMinimax(5, Color.White, nbAlignement);
+        this.p1 = new Human(Color.Black);
+        this.p2 = new Human(Color.White);
     }
 
     /**
@@ -236,7 +236,7 @@ public class Game {
     private Player checkPlayerTypeValid(String playerType, Color color, String profondeur) {
         switch (playerType.toLowerCase()) {
             case "humain":
-                return new Humain(color);
+                return new Human(color);
             case "minimax":
                 if (profondeur == null) {
                     throw new IllegalArgumentException("Invalid depth");

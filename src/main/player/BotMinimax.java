@@ -10,7 +10,6 @@ public class BotMinimax extends Player {
 
     private final int depth; // Profondeur de l'algorithme
     private static final int MAX_SCORE = 1000; // Score élevé pour une victoire
-    private static final int MIN_SCORE = -1000; // Score faible pour une défaite
     private int nbAlignementWin;
 
     // Constructeur
@@ -54,8 +53,8 @@ public class BotMinimax extends Player {
 
             for (Coordonnees move : board.getMovePossible()) {
                 board.addBoule(new Boule(move, turn));
-                int eval = evaluateMove(board, move, turn);
-                maxEval = Math.max(eval, minimax(board, switchColor(turn), depth - 1, false));
+                int eval = minimax(board, switchColor(turn), depth - 1, false);
+                maxEval = Math.max(maxEval, eval);
                 board.removeBoule(move);
             }
 
@@ -67,9 +66,8 @@ public class BotMinimax extends Player {
 
             for (Coordonnees move : board.getMovePossible()) {
                 board.addBoule(new Boule(move, turn));
-                int eval = evaluateMove(board, move, turn);
-                minEval = Math.min(eval, minimax(board, switchColor(turn), depth - 1, true));
-
+                int eval = minimax(board, switchColor(turn), depth - 1, true);
+                minEval = Math.min(minEval, eval);
                 board.removeBoule(move);
             }
 
@@ -79,40 +77,6 @@ public class BotMinimax extends Player {
 
     private static Color switchColor(Color color) {
         return (color == Color.Black) ? Color.White : Color.Black;
-    }
-
-    public int evaluateMove(Board board, Coordonnees move, Color turn) {
-        int score = 0;
-        score += countBouleAligne(board, move.getX(), move.getY(), 0, 1, turn.toChar());
-        score += countBouleAligne(board, move.getX(), move.getY(), 1, 0, turn.toChar());
-        score += countBouleAligne(board, move.getX(), move.getY(), -1, 1, turn.toChar());
-
-        return score;
-    }
-
-
-    public int countBouleAligne(Board board, int startX, int startY, int dx, int dy, char boule) {
-        int count = 0;
-        int taille = board.getGrille().getTaille();
-        // Compter les boules alignées dans la direction donnée
-        for (int i = 0; i < nbAlignementWin; i++) {
-            int x = startX + i * dx;
-            int y = startY + i * dy;
-
-            // Vérifier si on sort de la grille
-            if (x < 0 || x >= taille || y < 0 || y >= taille) {
-                break;
-            }
-
-            // Vérifier si la boule correspond
-            if (board.getGrille().getEmplacement(new Coordonnees(x, y)) == boule) {
-                count++;
-            } else {
-                break;  // Si une boule n'est pas de la même couleur, arrêter de compter
-            }
-        }
-
-        return count;
     }
 
 

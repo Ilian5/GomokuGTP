@@ -4,10 +4,10 @@ import main.board.Board;
 import main.boules.Coordonnees;
 import main.utils.Color;
 
-public class Humain extends Player {
+public class Human extends Player {
 
 
-    public Humain(Color color) {
+    public Human(Color color) {
         super(color);
     }
     @Override
