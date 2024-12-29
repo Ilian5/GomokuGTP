@@ -53,4 +53,4 @@ Le **bot Minimax** ne fonctionne pas comme prévu. Il choisit des coups suboptim
 
 1. Clonez ce repository :
    ```bash
-   git clone https://github.com/votre-utilisateur/gomoku.git
+   git clone https://github.com/Ilian5/GomokuGTP.git
