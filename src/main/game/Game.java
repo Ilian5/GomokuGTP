@@ -245,7 +245,7 @@ public class Game {
                     int depth = Integer.parseInt(profondeur);
                     return new BotMinimax(depth, nbAlignement, color);
                 } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException("Invaid depth");
+                    throw new IllegalArgumentException("Invalid depth");
                 }
             case "aleatoire":
                 return new BotAleatoire(color);
