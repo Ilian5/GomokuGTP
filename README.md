@@ -1,5 +1,21 @@
 # Gomoku - Jeu de stratégie avec IA Minimax
 
+## NOTE 15
+
+## CORRECTION
+Il faut respecter les consignes : je ne vois pas les membres du projet listés ici, je ne vois pas diagramme d'architecture !
+
+Les tests unitaires sont très insuffisnts.
+
+Il manques information sur le nom des players "human" et "Human" ne marchent pas. J'ai du lire le code pour voir qu'il faut mettre "humain" !
+
+Je ne vois pas de mode partie ! C'est fastidieux.
+
+Les coordonnées ne sont pas conformes (le goban est tourné).
+
+J'ai joué contre minimax qui semble fontionner correctement.
+
+
 ## 📝 Description
 
 Ce projet implémente le **jeu Gomoku** avec une interface en ligne de commande et un **bot IA** utilisant l'algorithme **Minimax**. Le jeu permet à un joueur humain de jouer contre une IA ou contre un autre joueur humain.
